@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.scripts.spring import Spring
+from src.scripts.spring import Softbody
 
 pygame.init()
 
@@ -12,8 +12,10 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        self.spring = Spring(
-            pygame.Vector2(640, 100), pygame.Vector2(840, 350), 5, 0.1, 350)
+        #self.spring = Spring(
+        #    pygame.Vector2(640, 100), pygame.Vector2(840, 350), 5, 0.1, 350)
+
+        self.softbody = Softbody(self.ScreenSize)
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -24,7 +26,8 @@ class App():
             self.clock.tick(self.fps)
             screen.fill((255, 255, 255))
 
-            self.spring.draw(screen)
+            self.softbody.draw(screen)
+            #self.spring.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == QUIT:
