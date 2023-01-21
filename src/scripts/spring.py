@@ -5,6 +5,7 @@ from .mouse import Mouse
 
 
 class Spring:
+    #PUT EXTENSION INTO CONNECTIONS, NOT INTO SPRING
     def __init__(self, position, mass, stiffness, extension, static=False):
         self.position = pygame.Vector2(position)
         self.mass = mass
@@ -17,23 +18,43 @@ class Spring:
         self.connections = []
 
         self.gravity = pygame.Vector2(0, 0.5)
-        self.damping = pygame.Vector2(0.97, 0.97)
+        self.damping = pygame.Vector2(0.92, 0.92)
 
         self.static = static
 
     def draw(self, screen):
         for spring in self.connections:
-            pygame.draw.line(screen, (0, 0, 0), self.position, spring.position, 3)
+            pygame.draw.line(screen, (0, 0, 0), self.position, spring[0].position, 3)
 
         pygame.draw.circle(screen, (255, 0, 0), self.position, 6)
 
-    def update(self):
+    def updateOld(self):
         for spring in self.connections:
             distance = self.position - spring.position
             length = distance.length()
             angle = math.atan2(distance[1], distance[0])
 
             springForce = (-self.stiffness * (length - self.extension)) / self.mass
+            
+            self.acceleration.x += springForce * math.cos(angle)
+            self.acceleration.y += springForce * math.sin(angle)
+
+        self.acceleration += self.gravity
+
+        self.velocity += self.acceleration 
+        self.position += self.velocity
+
+        self.velocity = self.velocity.elementwise() * self.damping
+        self.acceleration *= 0
+
+    def update(self):
+        for spring in self.connections:
+            extension = spring[1]
+            distance = self.position - spring[0].position
+            length = distance.length()
+            angle = math.atan2(distance[1], distance[0])
+
+            springForce = (-self.stiffness * (length - extension)) / self.mass
             
             self.acceleration.x += springForce * math.cos(angle)
             self.acceleration.y += springForce * math.sin(angle)
@@ -75,8 +96,10 @@ class Softbody:
 
     def draw(self, screen):
         self.update()
+        pos = []
         for spring in self.springs:
             spring.draw(screen)
+            pos.append(spring.position)
 
     def update(self):
         for spring in self.springs:
@@ -106,7 +129,7 @@ class SoftbodySquare(Softbody):
         super().__init__(ScreenSize)
 
         mass = 10
-        stiffness = 0.25
+        stiffness = 1.0
 
         self.springs = [
             Spring(rect.topleft, mass, stiffness, rect.width),
@@ -114,7 +137,29 @@ class SoftbodySquare(Softbody):
             Spring(rect.bottomright, mass, stiffness, rect.width),
             Spring(rect.bottomleft, mass, stiffness, rect.width)
         ]
-        self.springs[0].connections = [self.springs[1], self.springs[2], self.springs[3]]
-        self.springs[1].connections = [self.springs[0], self.springs[2], self.springs[3]]
-        self.springs[2].connections = [self.springs[0], self.springs[1], self.springs[3]]
-        self.springs[3].connections = [self.springs[0], self.springs[1], self.springs[2]]
+        self.springs[0].connections = [
+        [self.springs[1], rect.width], [self.springs[2], 300],
+        [self.springs[3], rect.width]
+        ]
+        self.springs[1].connections = [
+        [self.springs[0], rect.width], [self.springs[2], rect.width],
+        [self.springs[3], 300]
+        ]
+        self.springs[2].connections = [
+        [self.springs[0], 300], [self.springs[1], rect.width],
+        [self.springs[3], rect.width]
+        ]
+        self.springs[3].connections = [
+        [self.springs[0], rect.width], [self.springs[1], 300],
+        [self.springs[2], rect.width]
+        ]
+        
+       
+
+
+class SoftbodyBall(Softbody):
+    def __init__(self, ScreenSize, center, radius, sides):
+        super().__init__(ScreenSize)
+
+        mass = 10
+        stiffness = 0.25
