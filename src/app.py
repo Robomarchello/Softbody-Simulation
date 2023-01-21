@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
-from src.scripts.spring import Softbody
+from src.scripts.spring import Softbody, SoftbodySquare
+from src.scripts.mouse import Mouse
 
 pygame.init()
 
@@ -12,10 +13,12 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        #self.spring = Spring(
-        #    pygame.Vector2(640, 100), pygame.Vector2(840, 350), 5, 0.1, 350)
+        rect = pygame.Rect(540, 200, 300, 300)
+        self.softbody = SoftbodySquare(rect, self.ScreenSize)
 
-        self.softbody = Softbody(self.ScreenSize)
+        self.event_handlers = [
+            Mouse, self.softbody
+        ]
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -33,5 +36,8 @@ class App():
                 if event.type == QUIT:
                     pygame.quit()
                     raise SystemExit
+                
+                for event_handler in self.event_handlers:
+                    event_handler.handle_event(event)
             
             pygame.display.update()

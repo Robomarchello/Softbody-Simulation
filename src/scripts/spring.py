@@ -1,11 +1,12 @@
 import pygame
 from pygame.locals import *
 import math
+from .mouse import Mouse
 
 
 class Spring:
     def __init__(self, position, mass, stiffness, extension, static=False):
-        self.position = position
+        self.position = pygame.Vector2(position)
         self.mass = mass
         self.velocity = pygame.Vector2(0, 0)
         self.acceleration = pygame.Vector2(0, 0)
@@ -45,21 +46,32 @@ class Spring:
         self.velocity = self.velocity.elementwise() * self.damping
         self.acceleration *= 0
 
+    def resolveBounds(self, ScreenSize):
+        if self.position.x < 0:
+            self.position.x = 0
+            self.acceleration.x += self.gravity[1]
+
+        if self.position.x > ScreenSize[0]:
+            self.position.x = ScreenSize[0]
+            self.acceleration.x -= self.gravity[1]
+
+        if self.position.y < 0:
+            self.position.y = 0
+            self.acceleration.y += self.gravity[1]
+
+        if self.position.y > ScreenSize[1]:
+            self.position.y = ScreenSize[1]
+            self.acceleration.y -= self.gravity[1]
+
 
 class Softbody:
     def __init__(self, ScreenSize):
         self.ScreenSize = ScreenSize
 
-        self.springs = [
-            Spring(pygame.Vector2(440, 100), 10, 0.1, 350),
-            Spring(pygame.Vector2(840, 100), 10, 0.1, 350),
-            Spring(pygame.Vector2(440, 500), 10, 0.1, 350),
-            Spring(pygame.Vector2(840, 500), 10, 0.1, 350),
-        ]
-        self.springs[0].connections = [self.springs[1], self.springs[2], self.springs[3]]
-        self.springs[1].connections = [self.springs[0], self.springs[2], self.springs[3]]
-        self.springs[2].connections = [self.springs[0], self.springs[1], self.springs[3]]
-        self.springs[3].connections = [self.springs[0], self.springs[1], self.springs[2]]
+        self.springs = []
+
+        self.holding = None
+        self.holdRadius = 100
 
     def draw(self, screen):
         self.update()
@@ -70,26 +82,39 @@ class Softbody:
         for spring in self.springs:
             if not spring.static:
                 spring.update()
-        self.resolveBounds()
+                spring.resolveBounds(self.ScreenSize)
 
-    def resolveBounds(self):
-        '''resolve bound collision with softbody'''
-        for spring in self.springs:
-            if spring.position.x < 0:
-                spring.position.x = 0
-                spring.acceleration.x += 1
-
-            if spring.position.x > self.ScreenSize[0]:
-                spring.position.x = self.ScreenSize[0]
-                spring.acceleration.x -= 1
-
-            if spring.position.y < 0:
-                spring.position.y = 0
-                spring.acceleration.y += 0.5
-
-            if spring.position.y > self.ScreenSize[1]:
-                spring.position.y = self.ScreenSize[1]
-                spring.acceleration.y -= 0.5
-
+        if self.holding != None:
+            self.holding.position = Mouse.position.copy()
+            self.holding.velocity *= 0
+            
     def handle_event(self, event):
-        pass
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                for spring in self.springs:
+                    distance = (spring.position - Mouse.position).length()
+
+                    if distance - self.holdRadius < 0:
+                        self.holding = spring
+
+        if event.type == MOUSEBUTTONUP:
+            self.holding = None    
+
+
+class SoftbodySquare(Softbody):
+    def __init__(self, rect, ScreenSize):
+        super().__init__(ScreenSize)
+
+        mass = 10
+        stiffness = 0.25
+
+        self.springs = [
+            Spring(rect.topleft, mass, stiffness, rect.width),
+            Spring(rect.topright, mass, stiffness, rect.width),
+            Spring(rect.bottomright, mass, stiffness, rect.width),
+            Spring(rect.bottomleft, mass, stiffness, rect.width)
+        ]
+        self.springs[0].connections = [self.springs[1], self.springs[2], self.springs[3]]
+        self.springs[1].connections = [self.springs[0], self.springs[2], self.springs[3]]
+        self.springs[2].connections = [self.springs[0], self.springs[1], self.springs[3]]
+        self.springs[3].connections = [self.springs[0], self.springs[1], self.springs[2]]
