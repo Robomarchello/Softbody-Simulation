@@ -16,10 +16,8 @@ class Softbody:
 
     def draw(self, screen):
         self.update()
-        pos = []
         for spring in self.springs:
             spring.draw(screen)
-            pos.append(spring.position)
 
     def update(self):
         for spring in self.springs:
@@ -75,50 +73,33 @@ class SoftbodySquare(Softbody):
         [self.springs[0], rect.width], [self.springs[1], diagonalLen],
         [self.springs[2], rect.width]
         ]
-        
+
+
        
+#copy def handle_event from softbody class when this done
 class PressureSoftbody:
-    '''Hey, this is not ready yet💋'''
+    '''Hey, not ready yet'''
     def __init__(self, ScreenSize):
         self.ScreenSize = ScreenSize
 
         self.springs = []
 
-        self.holding = None
-        self.holdRadius = 100
-
     def draw(self, screen):
+        #for spring in self.springs:
+        #    spring.draw(screen)
+
+        self.springs[6].draw(screen)
+        self.springs[7].draw(screen)
+        
         self.update()
-        pos = []
-        for spring in self.springs:
-            spring.draw(screen)
-            pos.append(spring.position)
 
     def update(self):
-        for spring in self.springs:
-            if not spring.static:
-                spring.update()
-                spring.resolveBounds(self.ScreenSize)
-
-        if self.holding != None:
-            self.holding.position = Mouse.position.copy()
-            self.holding.velocity *= 0
-            
-    def handle_event(self, event):
-        if event.type == MOUSEBUTTONDOWN:
-            if event.button == 1:
-                for spring in self.springs:
-                    distance = (spring.position - Mouse.position).length()
-
-                    if distance - self.holdRadius < 0:
-                        self.holding = spring
-
-        if event.type == MOUSEBUTTONUP:
-            self.holding = None    
+        #calculate pressure
+        print(self.springs[6].connections)
 
 
-class SoftbodyBall(Softbody):
-    '''This isn't ready neither'''
+class SoftbodyBall(PressureSoftbody):
+    '''Hey, not ready yet'''
     def __init__(self, ScreenSize, center, radius, sides):
         super().__init__(ScreenSize)
 
@@ -127,11 +108,12 @@ class SoftbodyBall(Softbody):
         self.sides = sides
 
         mass = 2
-        stiffness = 0.5
+        stiffness = 0.25
+        damping = 0.92
 
+        sideLength = (2 * radius * pi) / self.sides
         self.springs = []
         AnglePerSide = 360 / sides
-        sideLength = (2 * radius * pi) / self.sides
         for side in range(sides):
             angle = AnglePerSide * side
             position = pygame.Vector2(0, 0)
@@ -139,7 +121,7 @@ class SoftbodyBall(Softbody):
             position += self.center
             
             self.springs.append(
-                Spring(position, mass, stiffness)
+                Spring(position, mass, stiffness, damping)
             )
-
         
+        self.springs[6].connections = [[self.springs[7], sideLength]]

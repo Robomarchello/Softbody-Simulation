@@ -1,6 +1,15 @@
 import pygame
 from pygame.locals import *
-from math import cos, sin, atan2
+from dataclasses import dataclass
+
+
+@dataclass
+class Point:
+    #idk if i will use it (for later)
+    position: pygame.Vector2
+    mass: float
+    velocity = pygame.Vector2(0, 0)
+    acceleration = pygame.Vector2(0, 0)
 
 
 class Spring:
@@ -26,17 +35,8 @@ class Spring:
         pygame.draw.circle(screen, (255, 0, 0), self.position, 6)
 
     def update(self):
-        for spring in self.connections:
-            extension = spring[1]
-            distance = self.position - spring[0].position
-            length = distance.length()
-            angle = atan2(distance[1], distance[0])
-
-            springForce = (-self.stiffness * (length - extension)) / self.mass
-            
-            self.acceleration.x += springForce * cos(angle)
-            self.acceleration.y += springForce * sin(angle)
-
+        self.applySpringForce()
+        
         self.acceleration += self.gravity
 
         self.velocity += self.acceleration 
@@ -44,6 +44,22 @@ class Spring:
 
         self.velocity = self.velocity.elementwise() * self.damping
         self.acceleration *= 0
+
+    def applySpringForce(self):
+        #spring = [SpringObject, RestLength]
+        for spring in self.connections:
+            maxLength = spring[1]
+            distance = self.position - spring[0].position
+            length = distance.length()
+            if length != 0:
+                normalVec = distance.normalize()
+                
+                springForce = (-self.stiffness * (length - maxLength)) / self.mass
+                
+                self.acceleration += springForce * normalVec
+
+    def addForce(self, force):
+        self.acceleration += force / self.mass
 
     def resolveBounds(self, ScreenSize):
         if self.position.x < 0:

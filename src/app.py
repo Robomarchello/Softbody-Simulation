@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.scripts.softbody import Softbody, SoftbodySquare
+from src.scripts.softbody import SoftbodyBall, SoftbodySquare
 from src.scripts.mouse import Mouse
 
 pygame.init()
@@ -15,6 +15,7 @@ class App():
 
         rect = pygame.Rect(540, 200, 200, 200)
         self.softbody = SoftbodySquare(rect, self.ScreenSize)
+        #self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8)
 
         self.event_handlers = [
             Mouse, self.softbody
