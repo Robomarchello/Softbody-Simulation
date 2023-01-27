@@ -1,65 +1,34 @@
 import pygame
 from pygame.locals import *
-from dataclasses import dataclass
 
 
-@dataclass
+#tried to make this dataclass, but it didn't worked as i expected😭
 class Point:
-    #idk if i will use it (for later)
-    position: pygame.Vector2
-    mass: float
-    velocity = pygame.Vector2(0, 0)
-    acceleration = pygame.Vector2(0, 0)
-
-
-class Spring:
-    def __init__(self, position, mass, stiffness, damping, static=False):
-        self.position = pygame.Vector2(position)
+    def __init__(self, position, mass, damping, static):
+        self.position = position
         self.mass = mass
+        self.damping = damping
+        self.static = static
         self.velocity = pygame.Vector2(0, 0)
         self.acceleration = pygame.Vector2(0, 0)
-        
-        self.stiffness = stiffness
 
-        self.connections = []
-
-        self.gravity = pygame.Vector2(0, 0.5)
-        self.damping = pygame.Vector2(damping, damping)
-
-        self.static = static
+    @property
+    def gravity(self):
+        return pygame.Vector2(0, 0.1) * self.mass
 
     def draw(self, screen):
-        for spring in self.connections:
-            pygame.draw.line(screen, (0, 0, 0), self.position, spring[0].position, 3)
-
         pygame.draw.circle(screen, (255, 0, 0), self.position, 6)
 
     def update(self):
-        self.applySpringForce()
-        
         self.acceleration += self.gravity
 
-        self.velocity += self.acceleration 
-        self.position += self.velocity
+        self.velocity += self.acceleration
+        if not self.static:
+            self.position += self.velocity
 
-        self.velocity = self.velocity.elementwise() * self.damping
+        self.velocity *= self.damping
+
         self.acceleration *= 0
-
-    def applySpringForce(self):
-        #spring = [SpringObject, RestLength]
-        for spring in self.connections:
-            maxLength = spring[1]
-            distance = self.position - spring[0].position
-            length = distance.length()
-            if length != 0:
-                normalVec = distance.normalize()
-                
-                springForce = (-self.stiffness * (length - maxLength)) / self.mass
-                
-                self.acceleration += springForce * normalVec
-
-    def addForce(self, force):
-        self.acceleration += force / self.mass
 
     def resolveBounds(self, ScreenSize):
         if self.position.x < 0:
@@ -77,3 +46,35 @@ class Spring:
         if self.position.y > ScreenSize[1]:
             self.position.y = ScreenSize[1]
             self.acceleration.y -= self.gravity[1]
+
+
+class Spring:
+    def __init__(self, point1, point2, stiffness, restLength, damping):
+        self.point1 = point1
+        self.point2 = point2
+
+        self.stiffness = stiffness
+        self.restLength = restLength
+        self.damping = damping
+
+    def draw(self, screen):
+        pygame.draw.line(screen, (0, 0, 0), self.point1.position,
+                        self.point2.position, 3)
+
+    def update(self):
+        SpringForce = self.GetSpringForce()
+        
+        self.point1.acceleration += SpringForce / self.point1.mass
+        self.point2.acceleration -= SpringForce / self.point2.mass
+    
+    def GetSpringForce(self):
+        distance = self.point1.position - self.point2.position
+        length = distance.length()
+        if length != 0:
+            normalVec = distance.normalize()
+                
+            springForce = (-self.stiffness * (length - self.restLength))
+            
+            return springForce * normalVec
+
+        return pygame.Vector2(0, 0)
