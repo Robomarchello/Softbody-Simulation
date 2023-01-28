@@ -9,12 +9,10 @@ class Point:
         self.mass = mass
         self.damping = damping
         self.static = static
+
+        self.gravity = pygame.Vector2(0, 0.1) * self.mass
         self.velocity = pygame.Vector2(0, 0)
         self.acceleration = pygame.Vector2(0, 0)
-
-    @property
-    def gravity(self):
-        return pygame.Vector2(0, 0.1) * self.mass
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 0, 0), self.position, 6)
@@ -78,3 +76,21 @@ class Spring:
             return springForce * normalVec
 
         return pygame.Vector2(0, 0)
+
+    def GetNormal(self):
+        '''
+        gets perpendicular normal vector to the spring
+        cool trick to get perpendicular vector:
+        vec = [vec.y, -vec.x]
+        it's pretty simple but i like it
+        '''
+        SpringVec = self.point2.position - self.point1.position
+        
+        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize() * 20
+
+        #for visualization, real function will just do:
+        #return normalVec
+        startPos = SpringVec * 0.5 + self.point1.position
+        endPos = startPos + normalVec
+
+        return [startPos, endPos] 

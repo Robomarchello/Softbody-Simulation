@@ -74,8 +74,6 @@ class SoftbodySquare(Softbody):
         ]
 
 
-       
-#copy def handle_event from softbody class when this done
 class PressureSoftbody:
     '''Hey, not ready yet'''
     def __init__(self, ScreenSize):
@@ -85,18 +83,25 @@ class PressureSoftbody:
         self.springs = []
 
     def draw(self, screen):
-        #for spring in self.springs:
-        #    spring.draw(screen)
-
-        self.springs[6].draw(screen)
-        self.springs[7].draw(screen)
-        
         self.update()
+        for spring in self.springs:
+            spring.draw(screen)
+
+        for point in self.points:
+            point.draw(screen)
+
+        for spring in self.springs:
+            line = spring.GetNormal()
+            pygame.draw.line(screen, (100, 100, 100), line[0], line[1], 3)
 
     def update(self):
-        #calculate pressure
-        print(self.springs[6].connections)
+        for spring in self.springs:
+            spring.update()
 
+        for point in self.points:
+            point.update()
+            point.resolveBounds(self.ScreenSize)
+            
 
 class SoftbodyBall(PressureSoftbody):
     '''Hey, not ready yet'''
@@ -107,12 +112,11 @@ class SoftbodyBall(PressureSoftbody):
         self.radius = radius
         self.sides = sides
 
-        mass = 2
-        stiffness = 0.25
+        mass = 10
+        stiffness = 1.0
         damping = 0.92
 
         sideLength = (2 * radius * pi) / self.sides
-        self.springs = []
         AnglePerSide = 360 / sides
         for side in range(sides):
             angle = AnglePerSide * side
@@ -120,8 +124,18 @@ class SoftbodyBall(PressureSoftbody):
             position.from_polar((radius, angle))
             position += self.center
             
-            self.springs.append(
-                Spring(position, mass, stiffness, damping)
+            self.points.append(
+                Point(position, mass, damping, True)
             )
         
-        self.springs[6].connections = [[self.springs[7], sideLength]]
+        for index, point in enumerate(self.points):
+            nextPoint = index + 1
+            if nextPoint >= len(self.points):
+                nextPoint = 0
+
+            self.springs.append(
+                Spring(point, self.points[nextPoint],
+                    stiffness, sideLength, damping)
+                )
+
+

@@ -13,12 +13,12 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        rect = pygame.Rect(540, 200, 200, 200)
-        self.softbody = SoftbodySquare(rect, self.ScreenSize)
-        #self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8)
+        #rect = pygame.Rect(540, 200, 200, 200)
+        #self.softbody = SoftbodySquare(rect, self.ScreenSize)
+        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8)
 
         self.event_handlers = [
-            Mouse, self.softbody
+            Mouse#, self.softbody
         ]
 
         self.clock = pygame.time.Clock()
