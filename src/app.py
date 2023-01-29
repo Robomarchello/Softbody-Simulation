@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from src.scripts.softbody import SoftbodyBall, SoftbodySquare
 from src.scripts.mouse import Mouse
+from src.scripts.debug import Debug
 
 pygame.init()
 
@@ -39,5 +40,7 @@ class App():
                 
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
+
+            Debug.draw(screen)
             
             pygame.display.update()

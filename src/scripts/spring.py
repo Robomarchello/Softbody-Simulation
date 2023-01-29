@@ -55,11 +55,14 @@ class Spring:
         self.restLength = restLength
         self.damping = damping
 
+        self.normalVec = pygame.Vector2(0, 0)
+
     def draw(self, screen):
         pygame.draw.line(screen, (0, 0, 0), self.point1.position,
                         self.point2.position, 3)
 
     def update(self):
+        self.normalVec = self.GetNormal()
         SpringForce = self.GetSpringForce()
         
         self.point1.acceleration += SpringForce / self.point1.mass
@@ -86,11 +89,19 @@ class Spring:
         '''
         SpringVec = self.point2.position - self.point1.position
         
+        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize()
+
+        return normalVec
+
+    def NormalVisulalize(self):
+        #same as getNormal, but for visualization
+        SpringVec = self.point2.position - self.point1.position
         normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize() * 20
 
-        #for visualization, real function will just do:
-        #return normalVec
         startPos = SpringVec * 0.5 + self.point1.position
         endPos = startPos + normalVec
 
         return [startPos, endPos] 
+
+    def GetLength(self):
+        return (self.point1.position - self.point2.position).length()

@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from .spring import Spring, Point
 from .mouse import Mouse
+from .debug import Debug
 from math import pi, sqrt
 
 
@@ -82,6 +83,8 @@ class PressureSoftbody:
         self.points = []
         self.springs = []
 
+        self.volume = 0
+
     def draw(self, screen):
         self.update()
         for spring in self.springs:
@@ -91,8 +94,8 @@ class PressureSoftbody:
             point.draw(screen)
 
         for spring in self.springs:
-            line = spring.GetNormal()
-            pygame.draw.line(screen, (100, 100, 100), line[0], line[1], 3)
+            line = spring.NormalVisulalize()
+            Debug.line(line[0], line[1], (100, 100, 100))
 
     def update(self):
         for spring in self.springs:
@@ -101,7 +104,23 @@ class PressureSoftbody:
         for point in self.points:
             point.update()
             point.resolveBounds(self.ScreenSize)
-            
+
+        self.CalculateVolume()
+    
+    #probably it's area, not volume💀
+    def CalculateVolume(self):
+        volume = 0 
+        for spring in self.springs:
+            xLen = abs(spring.point1.position.x - spring.point2.position.x) / 2
+            normalX = abs(spring.normalVec.x)
+            magnitude = spring.GetLength()
+
+            volume += xLen * normalX * magnitude
+
+        Debug.text((5, 5), f'volume: {volume}')
+
+        return volume
+
 
 class SoftbodyBall(PressureSoftbody):
     '''Hey, not ready yet'''
@@ -117,6 +136,7 @@ class SoftbodyBall(PressureSoftbody):
         damping = 0.92
 
         sideLength = (2 * radius * pi) / self.sides
+        print(sideLength)
         AnglePerSide = 360 / sides
         for side in range(sides):
             angle = AnglePerSide * side
@@ -135,7 +155,4 @@ class SoftbodyBall(PressureSoftbody):
 
             self.springs.append(
                 Spring(point, self.points[nextPoint],
-                    stiffness, sideLength, damping)
-                )
-
-
+                    stiffness, sideLength, damping))
