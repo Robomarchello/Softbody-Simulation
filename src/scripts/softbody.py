@@ -83,6 +83,7 @@ class PressureSoftbody:
         self.points = []
         self.springs = []
 
+        self.gas_amount = 500.0
         self.volume = 0
 
     def draw(self, screen):
@@ -98,18 +99,35 @@ class PressureSoftbody:
             Debug.line(line[0], line[1], (100, 100, 100))
 
     def update(self):
+        volume = self.CalculateVolume()
+        #print(volume)
+        
         for spring in self.springs:
             spring.update()
+
+            #think about better implementation 
+            #i mean clearer code
+            length = spring.GetLength()
+            normalVec = spring.GetNormal()
+            if volume != 0:
+                OneOverV = (1 / volume)
+            else:
+                OneOverV = 0
+
+            PressureForce =  (OneOverV * length * self.gas_amount) * normalVec
+
+            spring.point1.acceleration += PressureForce
+            spring.point2.acceleration += PressureForce
 
         for point in self.points:
             point.update()
             point.resolveBounds(self.ScreenSize)
-
-        self.CalculateVolume()
-    
+              
     #probably it's area, not volume💀
     def CalculateVolume(self):
+        '''look page 4-5'''
         volume = 0 
+        
         for spring in self.springs:
             xLen = abs(spring.point1.position.x - spring.point2.position.x) / 2
             normalX = abs(spring.normalVec.x)
@@ -117,7 +135,7 @@ class PressureSoftbody:
 
             volume += xLen * normalX * magnitude
 
-        Debug.text((5, 5), f'volume: {volume}')
+        Debug.text((5, 5), f'volume: {round(volume, 2)}')
 
         return volume
 
@@ -136,7 +154,7 @@ class SoftbodyBall(PressureSoftbody):
         damping = 0.92
 
         sideLength = (2 * radius * pi) / self.sides
-        print(sideLength)
+
         AnglePerSide = 360 / sides
         for side in range(sides):
             angle = AnglePerSide * side
@@ -145,7 +163,7 @@ class SoftbodyBall(PressureSoftbody):
             position += self.center
             
             self.points.append(
-                Point(position, mass, damping, True)
+                Point(position, mass, damping, False)
             )
         
         for index, point in enumerate(self.points):

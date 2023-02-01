@@ -42,5 +42,5 @@ class App():
                     event_handler.handle_event(event)
 
             Debug.draw(screen)
-            
+
             pygame.display.update()
