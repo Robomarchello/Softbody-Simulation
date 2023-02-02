@@ -76,7 +76,6 @@ class SoftbodySquare(Softbody):
 
 
 class PressureSoftbody:
-    '''Hey, not ready yet'''
     def __init__(self, ScreenSize):
         self.ScreenSize = ScreenSize
 
@@ -127,15 +126,15 @@ class PressureSoftbody:
 
     def ApplyPressure(self, spring):
         '''
-        Pressure Calculations and their application is here
+        Pressure Calculation and their application is here
         Here are 3 parts:
-        1. Gathering 
+        1. Gathering needed values
         2. Pressure Force Calculation
         3. Applying the force to the spring points
         '''
         length = spring.GetLength()
         normalVec = spring.GetNormal()
-        OneOverArea = 1 / self.area #smaller the the area, bigger the force
+        OneOverArea = 1 / self.area #smaller the the area, stronger the force
 
         PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
 
