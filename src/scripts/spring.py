@@ -89,14 +89,14 @@ class Spring:
         '''
         SpringVec = self.point2.position - self.point1.position
         
-        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize()
+        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize()#length 0 error
 
         return normalVec
 
     def NormalVisulalize(self):
         #same as getNormal, but for visualization
         SpringVec = self.point2.position - self.point1.position
-        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize() * 20
+        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize() * 20#length 0 error
 
         startPos = SpringVec * 0.5 + self.point1.position
         endPos = startPos + normalVec

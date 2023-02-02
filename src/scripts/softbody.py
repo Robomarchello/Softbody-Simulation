@@ -83,8 +83,8 @@ class PressureSoftbody:
         self.points = []
         self.springs = []
 
-        self.gas_amount = 500.0
-        self.volume = 0
+        self.gas_amount = 2500.0
+        self.area = 0
 
     def draw(self, screen):
         self.update()
@@ -99,45 +99,48 @@ class PressureSoftbody:
             Debug.line(line[0], line[1], (100, 100, 100))
 
     def update(self):
-        volume = self.CalculateVolume()
-        #print(volume)
+        self.area = self.CalculateArea()
         
         for spring in self.springs:
+            self.ApplyPressure(spring)
             spring.update()
-
-            #think about better implementation 
-            #i mean clearer code
-            length = spring.GetLength()
-            normalVec = spring.GetNormal()
-            if volume != 0:
-                OneOverV = (1 / volume)
-            else:
-                OneOverV = 0
-
-            PressureForce =  (OneOverV * length * self.gas_amount) * normalVec
-
-            spring.point1.acceleration += PressureForce
-            spring.point2.acceleration += PressureForce
 
         for point in self.points:
             point.update()
             point.resolveBounds(self.ScreenSize)
-              
-    #probably it's area, not volume💀
-    def CalculateVolume(self):
-        '''look page 4-5'''
-        volume = 0 
-        
-        for spring in self.springs:
-            xLen = abs(spring.point1.position.x - spring.point2.position.x) / 2
-            normalX = abs(spring.normalVec.x)
-            magnitude = spring.GetLength()
+    
+    def CalculateArea(self):
+        '''
+        Simple, but inaccurate way to calculate area
+        *Probably* will change it
+        '''
+        xPoses = [point.position.x for point in self.points]
+        yPoses = [point.position.y for point in self.points]
+        width = max(xPoses) - min(xPoses)
+        height = max(yPoses) - min(yPoses)
 
-            volume += xLen * normalX * magnitude
+        area = width * height
 
-        Debug.text((5, 5), f'volume: {round(volume, 2)}')
+        Debug.text((5, 5), f'Area: {round(area, 2)}')
 
-        return volume
+        return area
+
+    def ApplyPressure(self, spring):
+        '''
+        Pressure Calculations and their application is here
+        Here are 3 parts:
+        1. Gathering 
+        2. Pressure Force Calculation
+        3. Applying the force to the spring points
+        '''
+        length = spring.GetLength()
+        normalVec = spring.GetNormal()
+        OneOverArea = 1 / self.area #smaller the the area, bigger the force
+
+        PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
+
+        spring.point1.acceleration += PressureForce# / spring.point1.mass
+        spring.point2.acceleration += PressureForce# / spring.point2.mass
 
 
 class SoftbodyBall(PressureSoftbody):
