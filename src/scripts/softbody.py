@@ -6,6 +6,112 @@ from .debug import Debug
 from math import pi, sqrt
 
 
+class PressureSoftbody:
+    def __init__(self, ScreenSize, gas_amount):
+        self.ScreenSize = ScreenSize
+
+        self.points = []
+        self.springs = []
+
+        self.gas_amount = gas_amount
+        self.area = 0
+
+    def draw(self, screen):
+        self.update()
+        for spring in self.springs:
+            spring.draw(screen)
+
+        for point in self.points:
+            point.draw(screen)
+
+        Debug.text((5, 5), f'Area: {round(self.area, 2)}')
+        Debug.text((5, 35), f'Gas Amount: {self.gas_amount}')
+
+    def update(self):
+        self.area = self.CalculateArea()
+        
+        for spring in self.springs:
+            self.ApplyPressure(spring)
+            spring.update()
+
+        for point in self.points:
+            point.update()
+            point.resolveBounds(self.ScreenSize)
+    
+    def CalculateArea(self):
+        '''
+        Simple, but inaccurate way to calculate area
+        *Probably* will change it
+        '''
+        #i don't like that making 2 loops for x and y poses
+        xPoses = [point.position.x for point in self.points]
+        yPoses = [point.position.y for point in self.points]
+        width = max(xPoses) - min(xPoses)
+        height = max(yPoses) - min(yPoses)
+
+        area = width * height
+
+        return area
+
+    def ApplyPressure(self, spring):
+        '''
+        Pressure Calculation and their application is here
+        Here are 3 parts:
+        1. Gathering needed values
+        2. Pressure Force Calculation
+        3. Applying the force to the spring points
+        '''
+        length = spring.GetLength()
+        normalVec = spring.GetNormal()
+        OneOverArea = 1 / self.area #smaller the the area, stronger the force
+
+        PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
+
+        spring.point1.acceleration += PressureForce# / spring.point1.mass
+        spring.point2.acceleration += PressureForce# / spring.point2.mass
+
+        spring.DrawNormal(PressureForce)
+
+
+class SoftbodyBall(PressureSoftbody):
+    def __init__(self, ScreenSize, center, radius, sides):
+        gas_amount = 5000.0
+        super().__init__(ScreenSize, gas_amount)
+
+        self.center = pygame.Vector2(center)
+        self.radius = radius
+        self.sides = sides
+
+        mass = 10#5
+        stiffness = 1.0
+        damping = 0.92
+
+        sideLength = (2 * radius * pi) / self.sides
+
+        AnglePerSide = 360 / sides
+        for side in range(sides):
+            angle = AnglePerSide * side
+            position = pygame.Vector2(0, 0)
+            position.from_polar((radius, angle))
+            position += self.center
+            
+            self.points.append(
+                Point(position, mass, damping, False)
+            )
+        
+        for index, point in enumerate(self.points):
+            nextPoint = index + 1
+            if nextPoint >= len(self.points):
+                nextPoint = 0
+
+            self.springs.append(
+                Spring(point, self.points[nextPoint],
+                    stiffness, sideLength, damping))
+
+
+
+
+# Square softbody below which i don't need right now
 class Softbody:
     def __init__(self, ScreenSize):
         self.ScreenSize = ScreenSize
@@ -73,106 +179,3 @@ class SoftbodySquare(Softbody):
             Spring(self.points[0], self.points[2], stiffness, diagonalLen, damping),
             Spring(self.points[1], self.points[3], stiffness, diagonalLen, damping)
         ]
-
-
-class PressureSoftbody:
-    def __init__(self, ScreenSize):
-        self.ScreenSize = ScreenSize
-
-        self.points = []
-        self.springs = []
-
-        self.gas_amount = 2500.0
-        self.area = 0
-
-    def draw(self, screen):
-        self.update()
-        for spring in self.springs:
-            spring.draw(screen)
-
-        for point in self.points:
-            point.draw(screen)
-
-        for spring in self.springs:
-            line = spring.NormalVisulalize()
-            Debug.line(line[0], line[1], (100, 100, 100))
-
-    def update(self):
-        self.area = self.CalculateArea()
-        
-        for spring in self.springs:
-            self.ApplyPressure(spring)
-            spring.update()
-
-        for point in self.points:
-            point.update()
-            point.resolveBounds(self.ScreenSize)
-    
-    def CalculateArea(self):
-        '''
-        Simple, but inaccurate way to calculate area
-        *Probably* will change it
-        '''
-        xPoses = [point.position.x for point in self.points]
-        yPoses = [point.position.y for point in self.points]
-        width = max(xPoses) - min(xPoses)
-        height = max(yPoses) - min(yPoses)
-
-        area = width * height
-
-        Debug.text((5, 5), f'Area: {round(area, 2)}')
-
-        return area
-
-    def ApplyPressure(self, spring):
-        '''
-        Pressure Calculation and their application is here
-        Here are 3 parts:
-        1. Gathering needed values
-        2. Pressure Force Calculation
-        3. Applying the force to the spring points
-        '''
-        length = spring.GetLength()
-        normalVec = spring.GetNormal()
-        OneOverArea = 1 / self.area #smaller the the area, stronger the force
-
-        PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
-
-        spring.point1.acceleration += PressureForce# / spring.point1.mass
-        spring.point2.acceleration += PressureForce# / spring.point2.mass
-
-
-class SoftbodyBall(PressureSoftbody):
-    '''Hey, not ready yet'''
-    def __init__(self, ScreenSize, center, radius, sides):
-        super().__init__(ScreenSize)
-
-        self.center = pygame.Vector2(center)
-        self.radius = radius
-        self.sides = sides
-
-        mass = 10
-        stiffness = 1.0
-        damping = 0.92
-
-        sideLength = (2 * radius * pi) / self.sides
-
-        AnglePerSide = 360 / sides
-        for side in range(sides):
-            angle = AnglePerSide * side
-            position = pygame.Vector2(0, 0)
-            position.from_polar((radius, angle))
-            position += self.center
-            
-            self.points.append(
-                Point(position, mass, damping, False)
-            )
-        
-        for index, point in enumerate(self.points):
-            nextPoint = index + 1
-            if nextPoint >= len(self.points):
-                nextPoint = 0
-
-            self.springs.append(
-                Spring(point, self.points[nextPoint],
-                    stiffness, sideLength, damping))

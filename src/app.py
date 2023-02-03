@@ -16,9 +16,7 @@ class App():
 
         self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8)
 
-        self.event_handlers = [
-            Mouse#, self.softbody
-        ]
+        self.event_handlers = [Mouse]
 
         self.clock = pygame.time.Clock()
         self.fps = fps

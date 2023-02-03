@@ -31,7 +31,7 @@ class Debug:
     def draw(cls, screen):
         for object in cls.draw_queue:
             if object[0] == 'line' or object[0] == 'vector':
-                pygame.draw.line(screen, object[3], object[1], object[2], 2)
+                pygame.draw.line(screen, object[3], object[1], object[2], 3)
             
             if object[0] == 'circle' or object[0] == 'point':
                 pygame.draw.circle(screen, object[4], object[1], object[2], object[3])

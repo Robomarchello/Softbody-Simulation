@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from .debug import Debug
 
 
 #tried to make this dataclass, but it didn't worked as i expected😭
@@ -93,15 +94,12 @@ class Spring:
 
         return normalVec
 
-    def NormalVisulalize(self):
-        #same as getNormal, but for visualization
+    def DrawNormal(self, force):
         SpringVec = self.point2.position - self.point1.position
-        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize() * 20#length 0 error
-
         startPos = SpringVec * 0.5 + self.point1.position
-        endPos = startPos + normalVec
+        endPos = startPos + (force * 5)
 
-        return [startPos, endPos] 
+        Debug.line(startPos, endPos, (0, 0, 0))
 
     def GetLength(self):
         return (self.point1.position - self.point2.position).length()
