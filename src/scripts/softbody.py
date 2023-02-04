@@ -76,10 +76,6 @@ class PressureSoftbody:
 class SoftbodyBall(PressureSoftbody):
     def __init__(self, ScreenSize, center, radius, sides,
                 mass, stiffness, damping, gas_amount):
-        #gas_amount = 5000.0
-        #mass = 10#5
-        #stiffness = 1.0
-        #damping = 0.92
         super().__init__(ScreenSize, gas_amount)
 
         self.center = pygame.Vector2(center)
