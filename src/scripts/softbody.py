@@ -74,17 +74,17 @@ class PressureSoftbody:
 
 
 class SoftbodyBall(PressureSoftbody):
-    def __init__(self, ScreenSize, center, radius, sides):
-        gas_amount = 5000.0
+    def __init__(self, ScreenSize, center, radius, sides,
+                mass, stiffness, damping, gas_amount):
+        #gas_amount = 5000.0
+        #mass = 10#5
+        #stiffness = 1.0
+        #damping = 0.92
         super().__init__(ScreenSize, gas_amount)
 
         self.center = pygame.Vector2(center)
         self.radius = radius
         self.sides = sides
-
-        mass = 10#5
-        stiffness = 1.0
-        damping = 0.92
 
         sideLength = (2 * radius * pi) / self.sides
 
@@ -111,7 +111,7 @@ class SoftbodyBall(PressureSoftbody):
 
 
 
-# Square softbody below which i don't need right now
+# ---- Square softbody below which i don't need right now
 class Softbody:
     def __init__(self, ScreenSize):
         self.ScreenSize = ScreenSize

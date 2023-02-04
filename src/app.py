@@ -14,7 +14,13 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8)
+        gas_amount = 5000.0
+        mass = 10
+        stiffness = 1.0
+        damping = 0.92
+
+        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 8,
+                                    mass, stiffness, damping, gas_amount)
 
         self.event_handlers = [Mouse]
 
