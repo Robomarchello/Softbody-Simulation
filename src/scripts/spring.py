@@ -63,6 +63,8 @@ class Spring:
                         self.point2.position, 3)
 
     def update(self):
+        #every frame and use this length everywhere
+        #self.length = self.get_length
         self.normalVec = self.GetNormal()
         SpringForce = self.GetSpringForce()
         
@@ -89,10 +91,12 @@ class Spring:
         it's pretty simple but i like it
         '''
         SpringVec = self.point2.position - self.point1.position
-        
-        normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize()#length 0 error
+        if SpringVec.length() != 0:
+            normalVec = pygame.Vector2(SpringVec.y, -SpringVec.x).normalize()
 
-        return normalVec
+            return normalVec
+        
+        return pygame.Vector2(0, 0)
 
     def DrawNormal(self, force):
         SpringVec = self.point2.position - self.point1.position

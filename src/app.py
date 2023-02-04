@@ -25,7 +25,7 @@ class App():
 
         self.HardBall = HardBall(150, [self.softbody])
 
-        self.event_handlers = [Mouse]
+        self.event_handlers = [Mouse, Debug]
 
         self.clock = pygame.time.Clock()
         self.fps = fps

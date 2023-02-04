@@ -6,6 +6,7 @@ pygame.init()
 class Debug:
     draw_queue = []
     font = pygame.font.Font('src/assets/font.ttf', 16)
+    display = True
 
     @classmethod
     def line(cls, startPos, endPos, color=(0, 0, 0)):
@@ -29,6 +30,9 @@ class Debug:
     
     @classmethod
     def draw(cls, screen):
+        if not cls.display:
+            cls.draw_queue = []
+
         for object in cls.draw_queue:
             if object[0] == 'line' or object[0] == 'vector':
                 pygame.draw.line(screen, object[3], object[1], object[2], 3)
@@ -41,3 +45,12 @@ class Debug:
                 screen.blit(render, object[2])
 
         cls.draw_queue = []
+
+    @classmethod
+    def handle_event(cls, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_d:
+                if cls.display:
+                    cls.display = False
+                else:
+                    cls.display = True
