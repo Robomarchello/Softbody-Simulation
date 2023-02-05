@@ -5,6 +5,7 @@ pygame.init()
 
 class Debug:
     draw_queue = []
+    #use freetype instead?
     font = pygame.font.Font('src/assets/font.ttf', 16)
     display = True
 

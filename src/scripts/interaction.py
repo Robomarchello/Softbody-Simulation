@@ -25,3 +25,49 @@ class HardBall:
                     point.acceleration -= SepForce
                     #not sure if this is the best solution, but works fine
                     point.position = self.position - normalDist * self.radius
+
+from pygame.locals import *
+
+class Settinger:
+    def __init__(self, softbody):
+        self.softbody = softbody
+
+        self.settings = {'gas_amount': True, 'mass': False, 
+                        'stiffness': False, 'damping': False}
+        self.settingsKeys = list(self.settings.keys())
+        self.CrntSetting = 0
+    
+    def handle_event(self, event):
+        if event.type == KEYDOWN:
+            if event.key == K_e:
+                if self.CrntSetting < len(self.settings) - 1:
+                    self.CrntSetting += 1
+                else:
+                    self.CrntSetting = 0
+
+            if event.key == K_q:
+                if self.CrntSetting > 0:
+                    self.CrntSetting -= 1
+                else:
+                    self.CrntSetting = len(self.settings) - 1
+
+            self.settings = {'gas_amount': False, 'mass': False, 
+                            'stiffness': False, 'damping': False}
+            self.settings[self.settingsKeys[self.CrntSetting]] = True
+        
+        if event.type == MOUSEWHEEL:
+            if self.settings['gas_amount']:
+                self.softbody.gas_amount += event.y * 25
+
+            if self.settings['mass']:
+                for point in self.softbody.points:
+                    point.mass += event.y * 0.1
+                    point.gravity = pygame.Vector2(0, 0.1) * point.mass
+
+            if self.settings['stiffness']:
+                for spring in self.softbody.springs:
+                    spring.stiffness += event.y * 0.005
+
+            if self.settings['damping']:
+                for point in self.softbody.points:
+                    point.damping += event.y * 0.005

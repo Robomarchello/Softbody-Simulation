@@ -51,6 +51,8 @@ class PressureSoftbody:
         height = max(yPoses) - min(yPoses)
 
         area = width * height
+        if area == 0:
+            area = 1
 
         return area
 
