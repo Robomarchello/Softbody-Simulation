@@ -46,6 +46,7 @@ class PressureSoftbody:
         #i don't like that making 2 loops for x and y poses
         xPoses = [point.position.x for point in self.points]
         yPoses = [point.position.y for point in self.points]
+
         width = max(xPoses) - min(xPoses)
         height = max(yPoses) - min(yPoses)
 
@@ -61,7 +62,7 @@ class PressureSoftbody:
         2. Pressure Force Calculation
         3. Applying the force to the spring points
         '''
-        length = spring.GetLength()
+        length = spring.length
         normalVec = spring.GetNormal()
         OneOverArea = 1 / self.area #smaller the the area, stronger the force
 

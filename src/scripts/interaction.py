@@ -15,10 +15,13 @@ class HardBall:
     def update(self):
         for softbody in self.softbodies:
             for point in softbody.points:
-                distance = self.position - point.position
+                distanceVec = self.position - point.position
+                normalDist = distanceVec.normalize()
+                distance = distanceVec.length() - self.radius
 
-                if distance.length() - self.radius < 0:
+                if distance < 0:
                     #calculating separating force
-                    point.acceleration -= distance * 0.05
+                    SepForce = normalDist.elementwise() * -(distance * 1.0)
+                    point.acceleration -= SepForce
                     #not sure if this is the best solution, but works fine
-                    point.position = self.position - distance.normalize() * self.radius
+                    point.position = self.position - normalDist * self.radius

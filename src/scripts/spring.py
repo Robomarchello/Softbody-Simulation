@@ -26,7 +26,6 @@ class Point:
             self.position += self.velocity
 
         self.velocity *= self.damping
-
         self.acceleration *= 0
 
     def resolveBounds(self, ScreenSize):
@@ -57,6 +56,7 @@ class Spring:
         self.damping = damping
 
         self.normalVec = pygame.Vector2(0, 0)
+        self.length = self.GetLength()
 
     def draw(self, screen):
         pygame.draw.line(screen, (0, 0, 0), self.point1.position,
@@ -64,7 +64,7 @@ class Spring:
 
     def update(self):
         #every frame and use this length everywhere
-        #self.length = self.get_length
+        self.length = self.GetLength()
         self.normalVec = self.GetNormal()
         SpringForce = self.GetSpringForce()
         
@@ -73,7 +73,7 @@ class Spring:
     
     def GetSpringForce(self):
         distance = self.point1.position - self.point2.position
-        length = distance.length()
+        length = self.length
         if length != 0:
             normalVec = distance.normalize()
                 

@@ -18,9 +18,9 @@ class App():
         gas_amount = 2500.0
         mass = 5
         stiffness = 1.0
-        damping = 0.92
+        damping = 0.96
 
-        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 150, 16,
+        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 75, 16,
                                     mass, stiffness, damping, gas_amount)
 
         self.HardBall = HardBall(150, [self.softbody])
