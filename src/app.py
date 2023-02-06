@@ -39,6 +39,7 @@ class App():
         screen = self.screen
         while True:
             self.clock.tick(self.fps)
+            self.Settinger.draw()
             screen.fill((255, 255, 255))
             
             self.HardBall.update()

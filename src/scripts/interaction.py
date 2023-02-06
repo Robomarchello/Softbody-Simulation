@@ -1,6 +1,6 @@
 import pygame
 from .mouse import Mouse
-
+from .debug import Debug
 
 #not separate simulation, but for interaction with softbodies
 class HardBall:
@@ -36,6 +36,13 @@ class Settinger:
                         'stiffness': False, 'damping': False}
         self.settingsKeys = list(self.settings.keys())
         self.CrntSetting = 0
+
+        #to draw
+        self.value = 0
+
+    def draw(self):
+        key = self.settingsKeys[self.CrntSetting]
+        Debug.text([5, 65], f'Editing {key}={self.value}')
     
     def handle_event(self, event):
         if event.type == KEYDOWN:
@@ -54,20 +61,29 @@ class Settinger:
             self.settings = {'gas_amount': False, 'mass': False, 
                             'stiffness': False, 'damping': False}
             self.settings[self.settingsKeys[self.CrntSetting]] = True
+            
         
         if event.type == MOUSEWHEEL:
             if self.settings['gas_amount']:
                 self.softbody.gas_amount += event.y * 25
+                self.value = self.softbody.gas_amount
 
             if self.settings['mass']:
                 for point in self.softbody.points:
                     point.mass += event.y * 0.1
                     point.gravity = pygame.Vector2(0, 0.1) * point.mass
 
+                    self.value = point.mass
+
             if self.settings['stiffness']:
                 for spring in self.softbody.springs:
                     spring.stiffness += event.y * 0.005
 
+                    self.value = spring.stiffness
+
             if self.settings['damping']:
                 for point in self.softbody.points:
                     point.damping += event.y * 0.005
+
+                    self.value = point.damping
+            
