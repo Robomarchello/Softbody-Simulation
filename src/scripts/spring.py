@@ -29,21 +29,32 @@ class Point:
         self.acceleration *= 0
 
     def resolveBounds(self, ScreenSize):
+        #Doesn't look like the best way, point "stick" a little to the bounds
+        #Not sure what options will be better
+        #comments are possible solutions
         if self.position.x < 0:
             self.position.x = 0
             self.acceleration.x += self.gravity[1]
+            #self.velocity.x *= 0
+            #self.velocity.x *= -self.damping
 
         if self.position.x > ScreenSize[0]:
             self.position.x = ScreenSize[0]
             self.acceleration.x -= self.gravity[1]
+            #self.velocity.x *= 0
+            #self.velocity.x *= -self.damping
 
         if self.position.y < 0:
             self.position.y = 0
             self.acceleration.y += self.gravity[1]
+            #self.velocity.y *= 0
+            #self.velocity.y *= -self.damping
 
         if self.position.y > ScreenSize[1]:
             self.position.y = ScreenSize[1]
             self.acceleration.y -= self.gravity[1]
+            #self.velocity.y *= 0
+            #self.velocity.y *= -self.damping
 
 
 class Spring:
