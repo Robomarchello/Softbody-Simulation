@@ -11,6 +11,7 @@ pygame.init()
 #gas, mass, stiffness, damping, radius, points
 #2500.0, 5, 1.0, 0.96, 75, 16
 #3500, 2.5, 1.0, 0.96, 50, 32
+#3000, 4.0, 1.1. 0.97, 75, 16
 
 class App():
     def __init__(self, ScreenSize, caption, fps):

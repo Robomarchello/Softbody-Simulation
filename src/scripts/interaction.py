@@ -65,12 +65,18 @@ class Settinger:
         
         if event.type == MOUSEWHEEL:
             if self.settings['gas_amount']:
-                self.softbody.gas_amount += event.y * 25
+                self.softbody.gas_amount += event.y * 25 
+                if self.softbody.gas_amount < 0:
+                    self.softbody.gas_amount = 0
+
                 self.value = self.softbody.gas_amount
 
             if self.settings['mass']:
                 for point in self.softbody.points:
                     point.mass += event.y * 0.1
+                    if point.mass < 0.1:
+                        point.mass = 0.1
+
                     point.gravity = pygame.Vector2(0, 0.1) * point.mass
 
                     self.value = point.mass
@@ -79,11 +85,17 @@ class Settinger:
                 for spring in self.softbody.springs:
                     spring.stiffness += event.y * 0.005
 
+                    if spring.stiffness < 0:
+                        spring.stiffness = 0
+
                     self.value = spring.stiffness
 
             if self.settings['damping']:
                 for point in self.softbody.points:
                     point.damping += event.y * 0.005
+
+                    if point.damping < 0:
+                        point.damping = 0
 
                     self.value = point.damping
             
