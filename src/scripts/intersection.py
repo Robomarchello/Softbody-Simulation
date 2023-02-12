@@ -10,9 +10,9 @@ pygame.init()
 class App():
     def __init__(self, ScreenSize, caption, fps):
         self.ScreenSize = ScreenSize
-
-        self.Checkline = [Vector2(25, 128), Vector2(640, 128)]
-        self.TargetLine = [Vector2(100, 60), Vector2(125, 150)]
+        
+        self.TargetLine = [Vector2(100, 150), Vector2(125, 150)]
+        self.Checkline = [Vector2(25, 128), Vector2(640, 128)]   
         
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
@@ -23,14 +23,21 @@ class App():
     def getIntersection(self):
         '''
         My solution to get intersection between horizontal line and any line
+        not cleanest one, but works
         '''
         self.TargetLine[1] = Mouse.position
         TargetVec = (self.TargetLine[1] - self.TargetLine[0]).normalize()
+        TargetY = [vec.y for vec in self.TargetLine]
 
         #0 length check
-        if self.TargetLine[0].xy == self.TargetLine[1].xy:
+        if self.TargetLine[0] == self.TargetLine[1].xy:
             return None
-        
+
+        #DO THE CHECK IF LINE INTERSECTS Y POSITION
+        if not (min(TargetY) < self.Checkline[0].y and
+                max(TargetY) > self.Checkline[0].y):
+            return None
+
         #check if lines are parallel
         if TargetVec.y == 0:
             return None
@@ -42,7 +49,7 @@ class App():
             HeightBtwn < 0 and TargetVec.y < 0):
 
             return None
-
+        
         position = TargetVec * HeightBtwn / TargetVec.y
         position += self.TargetLine[0]
 
@@ -74,4 +81,3 @@ class App():
             pygame.display.update()
 
 App((1280, 720), 'Intersection', 60).loop()
-
