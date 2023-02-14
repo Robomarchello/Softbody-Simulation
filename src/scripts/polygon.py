@@ -6,10 +6,15 @@ from pygame import Vector2
 class Polygon:
     def __init__(self, points):
         self.points = points
-        self.edges = [] #[point1, point2], ...
+        self.points = [Vector2(point) for point in self.points]
+        self.edges = [] #[point1, point2] or as indices???
 
     def draw(self, screen):
         pygame.draw.polygon(screen, (0, 0, 0), self.points, 3)
+
+        #or draw
+        #points as circles
+        #edges as lines
 
     def get_rect(self):
         topleft = [0, 0] #min poses
@@ -32,39 +37,47 @@ class Polygon:
 
             #0 length check
             if edgeLine[0].xy == edgeLine[1].xy:
-                break
+                continue#if don't work, try break
 
-            #DO THE CHECK IF LINE INTERSECTS Y POSITION
+            #Check if line segment positions intersect in y
             if not (min(EdgeY) < Checkline[0].y and
                     max(EdgeY) > Checkline[0].y):
-                break
+                continue
 
-                #check if lines are parallel
+            #check if lines are parallel
             if EdgeVec.y == 0:
-                break
+                continue
             
             HeightBtwn = Checkline[0].y - edgeLine[0].y
 
             #check if line y direction has the same sign(+/-) height difference 
             if not (HeightBtwn > 0 and EdgeVec.y > 0) and not (
                 HeightBtwn < 0 and EdgeVec.y < 0):
-                
-                break
+                continue
                 
             position = EdgeVec * HeightBtwn / EdgeVec.y
             position += edgeLine[0]
 
             if position.x > Checkline[0].x and position.x < Checkline[1].x:
                 intersections.append(position)
+            
+
+        if (len(intersections) % 2) == 1:
+            return True
+
+            #true/false
+            #or return intersection points
+            #or return closest intersection and edge
         
     def collide_polygon(self, polygon):
         #run collide_point for every point of the other polygon
         pass
 
 #class PolygonJson
-#reads polygon data from json
+#reads polygon data from json file
 
-#
+#class PolyRect
+#size, center, angle?
 
 '''
 def getIntersection():
