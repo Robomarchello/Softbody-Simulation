@@ -2,7 +2,7 @@ import pygame
 from pygame import Vector2
 
 #could be also named obstacle.py
-#also, thats for static objects, we could also want collision between two softbodies
+#also, thats for static objects, could also want collision between two softbodies
 class Polygon:
     def __init__(self, points):
         self.points = points
@@ -10,7 +10,7 @@ class Polygon:
         self.edges = [] #[point1, point2] or as indices???
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, (0, 0, 0), self.points, 3)
+        pygame.draw.polygon(screen, (0, 0, 0), self.points, 1)
 
         #or draw
         #points as circles
@@ -28,7 +28,8 @@ class Polygon:
         not cleanest one, but works
         '''
         #return intersection point + force normal to edge of the collision
-        Checkline = [Vector2(0, point.y), Vector2(point.x, point.y)]   
+        Checkline = [Vector2(0, point.y), Vector2(point.x, point.y)]  
+        #print(point) 
 
         intersections = []
         for edgeLine in self.edges:
@@ -38,10 +39,10 @@ class Polygon:
             #0 length check
             if edgeLine[0].xy == edgeLine[1].xy:
                 continue#if don't work, try break
-
+            
             #Check if line segment positions intersect in y
-            if not (min(EdgeY) < Checkline[0].y and
-                    max(EdgeY) > Checkline[0].y):
+            if not (min(EdgeY) <= Checkline[0].y and
+                    max(EdgeY) >= Checkline[0].y):
                 continue
 
             #check if lines are parallel
@@ -60,7 +61,6 @@ class Polygon:
 
             if position.x > Checkline[0].x and position.x < Checkline[1].x:
                 intersections.append(position)
-            
 
         if (len(intersections) % 2) == 1:
             return True

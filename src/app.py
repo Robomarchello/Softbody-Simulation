@@ -57,6 +57,7 @@ class App():
             if self.Polygon.collide_point(Mouse.position):
                 screen.fill((255, 0, 0))
             self.Polygon.draw(screen)
+            pygame.draw.line(screen, (0, 0, 0), (0, Mouse.position.y), Mouse.position)
             #self.HardBall.update()
             #self.softbody.draw(screen)
 
