@@ -1,13 +1,30 @@
 import pygame
 from pygame import Vector2
+from json import loads
+
 
 #could be also named obstacle.py
 #also, thats for static objects, could also want collision between two softbodies
 class Polygon:
-    def __init__(self, points):
+    def __init__(self, points, indices):
         self.points = points
         self.points = [Vector2(point) for point in self.points]
-        self.edges = [] #[point1, point2] or as indices???
+
+        self.edges = []
+        for index in indices:
+            edge = [self.points[index[0]], self.points[index[1]]]
+            
+            self.edges.append(edge)
+    
+    def indicesToEdges(self, indices):
+        edges = []
+
+        for index in indices:
+            edge = [self.points[index[0]], self.points[index[1]]]
+            
+            edges.append(edge)
+
+        return edges
 
     def draw(self, screen):
         pygame.draw.polygon(screen, (0, 0, 0), self.points, 1)
@@ -29,7 +46,6 @@ class Polygon:
         '''
         #return intersection point + force normal to edge of the collision
         Checkline = [Vector2(0, point.y), Vector2(point.x, point.y)]  
-        #print(point) 
 
         intersections = []
         for edgeLine in self.edges:
@@ -38,11 +54,11 @@ class Polygon:
 
             #0 length check
             if edgeLine[0].xy == edgeLine[1].xy:
-                continue#if don't work, try break
+                continue
             
             #Check if line segment positions intersect in y
-            if not (min(EdgeY) <= Checkline[0].y and
-                    max(EdgeY) >= Checkline[0].y):
+            if not (min(EdgeY) < Checkline[0].y and
+                    max(EdgeY) > Checkline[0].y):
                 continue
 
             #check if lines are parallel
@@ -62,6 +78,8 @@ class Polygon:
             if position.x > Checkline[0].x and position.x < Checkline[1].x:
                 intersections.append(position)
 
+        print(len(intersections))
+
         if (len(intersections) % 2) == 1:
             return True
 
@@ -73,8 +91,16 @@ class Polygon:
         #run collide_point for every point of the other polygon
         pass
 
-#class PolygonJson
-#reads polygon data from json file
+
+class PolygonJson(Polygon):
+    def __init__(self, file):
+        with open(file, 'r') as polyFile:
+            data = loads(polyFile.read())
+
+            self.points = data['points']
+            self.edges = data['edges']
+
+        super().__init__(self.points, self.edges)
 
 #class PolyRect
 #size, center, angle?
