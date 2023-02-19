@@ -24,8 +24,7 @@ class App():
         self.Settinger = Settinger(self.softbody)
 
         #-- polygon --
-        indices = [[0, 1], [1, 2], [2, 3], [3, 0]]
-        self.Polygon = PolygonJson('src/assets/polygon.json')
+        self.Polygon = PolygonJson('src/assets/polygon1.json')
 
         self.event_handlers = [Mouse, Debug]#, self.Settinger]
 
@@ -41,6 +40,9 @@ class App():
 
             if self.Polygon.collide_point(Mouse.position):
                 screen.fill((255, 0, 0))
+            #intersections = self.Polygon.collide_point(Mouse.position)
+            #for position in intersections:
+            #    pygame.draw.circle(screen, (255, 0, 0), position, 3)
             self.Polygon.draw(screen)
             pygame.draw.line(screen, (0, 0, 0), (0, Mouse.position.y), Mouse.position)
 
