@@ -39,7 +39,8 @@ class App():
             screen.fill((255, 255, 255))
 
             if self.Polygon.collide_point(Mouse.position):
-                screen.fill((255, 0, 0))
+                ...
+                #screen.fill((255, 0, 0))
             #intersections = self.Polygon.collide_point(Mouse.position)
             #for position in intersections:
             #    pygame.draw.circle(screen, (255, 0, 0), position, 3)
