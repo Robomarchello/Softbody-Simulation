@@ -68,7 +68,6 @@ class Polygon:
                 intersections.append(position)
                 Debug.circle(position, 2, 0)
 
-
         Debug.text((5, 5), str(len(intersections)))
 
         result = []
@@ -80,9 +79,50 @@ class Polygon:
                 result.append(intersection)
 
         if (len(result) % 2) == 1:
+            self.collisionResolve(point)
             return True
         
         return False 
+    
+    def collisionResolve(self, point):
+        '''return closest point and normal vec'''
+
+        for edge in self.edges:
+            closestPoint = self.getClosest(point, edge)
+
+            Debug.circle(closestPoint, 3, 0, (0, 255, 0))
+
+    def getClosest(self, position, edge,):
+          #Hope you get this
+        '''Returns the closest point on a line segment from point'''
+        TargetPointPos = position - edge[0] 
+
+        EdgeVec = (edge[1] - edge[0])
+        VecNormal = EdgeVec.normalize()
+        normal = Vector2(VecNormal.y, -VecNormal.x)            
+
+        distanceX = (EdgeVec - TargetPointPos).x * VecNormal.y
+        distanceY = -(EdgeVec - TargetPointPos).y * VecNormal.x
+
+        ClosestPos = normal * (distanceX + distanceY)
+        ClosestPos += position
+
+        #not that important - check if point is on the line
+        minPos = [min((edge[0].x, edge[1].x)), min((edge[0].y, edge[1].y))]
+        maxPos = [max((edge[0].x, edge[1].x)), max((edge[0].y, edge[1].y))]
+        if ClosestPos.x < minPos[0]:
+            ClosestPos.x = minPos[0]
+
+        elif ClosestPos.x > maxPos[0]:
+            ClosestPos.x = maxPos[0]
+
+        if ClosestPos.y < minPos[1]:
+            ClosestPos.y = minPos[1]
+
+        elif ClosestPos.y > maxPos[1]:
+            ClosestPos.y = maxPos[1]
+
+        return ClosestPos
 
     def collide_polygon(self, polygon):
         #run collide_point for every point of the other polygon

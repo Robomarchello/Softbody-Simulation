@@ -18,6 +18,10 @@ class Debug:
         cls.draw_queue.append(['vector', point, point + vector, color])
 
     @classmethod
+    def rect(cls, rect, width, color=(0, 0, 0)):
+        cls.draw_queue.append(['rect', rect, width, color])
+
+    @classmethod
     def circle(cls, center, radius, width, color=(0, 0, 0)):
         cls.draw_queue.append(['circle', center, radius, width, color])
 
@@ -40,6 +44,9 @@ class Debug:
             
             if object[0] == 'circle' or object[0] == 'point':
                 pygame.draw.circle(screen, object[4], object[1], object[2], object[3])
+            
+            if object[0] == 'rect':
+                pygame.draw.rect(screen, object[3], object[1], object[2])
 
             if object[0] == 'text':
                 render = cls.font.render(object[1], False, object[3])
