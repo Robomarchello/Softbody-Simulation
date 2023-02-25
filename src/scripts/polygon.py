@@ -10,7 +10,8 @@ class Polygon:
     def __init__(self, points, indices):
         self.points = points
         self.points = [Vector2(point) for point in self.points]
-
+        
+        self.indices = indices
         self.edges = []
         for index in indices:
             edge = [self.points[index[0]], self.points[index[1]]]
@@ -79,20 +80,36 @@ class Polygon:
                 result.append(intersection)
 
         if (len(result) % 2) == 1:
-            self.collisionResolve(point)
+            #self.collisionResolve(point)
             return True
         
         return False 
     
     def collisionResolve(self, point):
         '''return closest point and normal vec'''
+        if self.collide_point(point):#if True:
+            points = []
+            normal = []
+            distances = []
+            for edge in self.edges:
+                edgeClosest = self.getClosest(point, edge)
+                
+                points.append(edgeClosest[0])
+                normal.append(edgeClosest[1])
+                distances.append((edgeClosest[0] - point).magnitude())
+                
+                Debug.circle(edgeClosest[0], 3, 0, (0, 255, 0))
 
-        for edge in self.edges:
-            closestPoint = self.getClosest(point, edge)
+            edgeIndex = distances.index(min(distances))
+            closestPoint = points[edgeIndex]
+            normalVec = normal[edgeIndex]
 
-            Debug.circle(closestPoint, 3, 0, (0, 255, 0))
+            return [edgeIndex, closestPoint, normalVec]
 
-    def getClosest(self, position, edge,):
+        #no collision
+        return False
+
+    def getClosest(self, position, edge):
           #Hope you get this
         '''Returns the closest point on a line segment from point'''
         TargetPointPos = position - edge[0] 
@@ -122,7 +139,7 @@ class Polygon:
         elif ClosestPos.y > maxPos[1]:
             ClosestPos.y = maxPos[1]
 
-        return ClosestPos
+        return [ClosestPos, VecNormal]
 
     def collide_polygon(self, polygon):
         #run collide_point for every point of the other polygon
