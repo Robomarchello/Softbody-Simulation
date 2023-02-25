@@ -12,17 +12,18 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        gas_amount = 2500.0
+        gas_amount = 1500.0
         mass = 5
         stiffness = 1.0
         damping = 0.96
 
         #-- polygon --
-        self.Polygon = PolygonJson('src/assets/polygon2.json')
 
-        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 40, 16,
+        self.polygons = [PolygonJson('src/assets/polygon.json')]
+
+        self.softbody = SoftbodyBall(self.ScreenSize, (150, 50), 30, 16,
                                     mass, stiffness, damping, gas_amount,
-                                    [self.Polygon])
+                                    self.polygons)
 
         self.HardBall = HardBall(100, [self.softbody])
         self.Settinger = Settinger(self.softbody)
@@ -43,7 +44,8 @@ class App():
             #if collision != False:
             #    screen.fill((255, 0, 0))
 
-            self.Polygon.draw(screen)
+            for polygon in self.polygons:
+                polygon.draw(screen)
             #pygame.draw.line(screen, (0, 0, 0), (0, Mouse.position.y), Mouse.position)
 
             self.HardBall.update()

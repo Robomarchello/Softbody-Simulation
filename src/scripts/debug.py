@@ -5,9 +5,9 @@ pygame.init()
 
 class Debug:
     draw_queue = []
-    #use freetype instead?
+
     font = pygame.font.Font('src/assets/font.ttf', 16)
-    display = True
+    display = False#True
 
     @classmethod
     def line(cls, startPos, endPos, color=(0, 0, 0)):

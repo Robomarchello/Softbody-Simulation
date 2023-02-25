@@ -95,8 +95,10 @@ class Polygon:
         '''return closest point and normal vec'''
         #additional collision step for performance
         collideRect = self.rect.collidepoint(point)
-        
-        if self.collide_point(point) and collideRect:
+        #TRY THIS
+        #if collideRect:
+        #collidepolygon = self.collide_point(point)
+        if collideRect and self.collide_point(point):
             points = []
             normal = []
             distances = []
