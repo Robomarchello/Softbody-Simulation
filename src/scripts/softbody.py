@@ -7,7 +7,7 @@ from math import pi, sqrt
 
 
 class PressureSoftbody:
-    def __init__(self, ScreenSize, gas_amount):
+    def __init__(self, ScreenSize, gas_amount, obstacles=[]):
         self.ScreenSize = ScreenSize
 
         self.points = []
@@ -15,6 +15,9 @@ class PressureSoftbody:
 
         self.gas_amount = gas_amount
         self.area = 0
+
+        #these are polygon class 
+        self.obstacles = obstacles
 
     def draw(self, screen):
         self.update()
@@ -37,7 +40,18 @@ class PressureSoftbody:
         for point in self.points:
             point.update()
             point.resolveBounds(self.ScreenSize)
-    
+
+            for obstacle in self.obstacles:
+                #[edgeIndex, closestPoint, normalVec]
+                collision = obstacle.collisionResolve(point.position)
+
+                if collision != False:
+                    point.position = collision[1]
+                    #print(collision[2].elementwise() * point.velocity)         
+                    point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
+                    point.velocity *= 0
+
+                    
     def CalculateArea(self):
         '''
         Simple, but inaccurate way to calculate area
@@ -78,8 +92,8 @@ class PressureSoftbody:
 
 class SoftbodyBall(PressureSoftbody):
     def __init__(self, ScreenSize, center, radius, sides,
-                mass, stiffness, damping, gas_amount):
-        super().__init__(ScreenSize, gas_amount)
+                mass, stiffness, damping, gas_amount, obstacles=[]):
+        super().__init__(ScreenSize, gas_amount, obstacles)
 
         self.center = pygame.Vector2(center)
         self.radius = radius

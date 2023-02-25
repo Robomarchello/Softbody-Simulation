@@ -17,16 +17,17 @@ class App():
         stiffness = 1.0
         damping = 0.96
 
-        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 75, 16,
-                                    mass, stiffness, damping, gas_amount)
+        #-- polygon --
+        self.Polygon = PolygonJson('src/assets/polygon2.json')
+
+        self.softbody = SoftbodyBall(self.ScreenSize, (640, 300), 40, 16,
+                                    mass, stiffness, damping, gas_amount,
+                                    [self.Polygon])
 
         self.HardBall = HardBall(100, [self.softbody])
         self.Settinger = Settinger(self.softbody)
 
-        #-- polygon --
-        self.Polygon = PolygonJson('src/assets/polygon1.json')
-
-        self.event_handlers = [Mouse, Debug]#, self.Settinger]
+        self.event_handlers = [Mouse, Debug, self.Settinger]
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -35,23 +36,18 @@ class App():
         screen = self.screen
         while True:
             self.clock.tick(self.fps)
-            #self.Settinger.draw()
+            self.Settinger.draw()
             screen.fill((255, 255, 255))
 
-            #if self.Polygon.collide_point(Mouse.position):
+            #collision = self.Polygon.collisionResolve(Mouse.position)
+            #if collision != False:
             #    screen.fill((255, 0, 0))
-            collision = self.Polygon.collisionResolve(Mouse.position)
-            if collision != False:
-                screen.fill((255, 0, 0))
-                
-            #intersections = self.Polygon.collide_point(Mouse.position)
-            #for position in intersections:
-            #    pygame.draw.circle(screen, (255, 0, 0), position, 3)
-            self.Polygon.draw(screen)
-            pygame.draw.line(screen, (0, 0, 0), (0, Mouse.position.y), Mouse.position)
 
-            #self.HardBall.update()
-            #self.softbody.draw(screen)
+            self.Polygon.draw(screen)
+            #pygame.draw.line(screen, (0, 0, 0), (0, Mouse.position.y), Mouse.position)
+
+            self.HardBall.update()
+            self.softbody.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -62,6 +58,6 @@ class App():
                     event_handler.handle_event(event)
 
             Debug.draw(screen)
-            #self.HardBall.draw(screen)
+            self.HardBall.draw(screen)
 
             pygame.display.update()

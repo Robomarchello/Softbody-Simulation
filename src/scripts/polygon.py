@@ -17,7 +17,9 @@ class Polygon:
             edge = [self.points[index[0]], self.points[index[1]]]
             
             self.edges.append(edge)
-    
+
+        self.rect = self.get_rect()
+
     def indicesToEdges(self, indices):
         edges = []
 
@@ -36,10 +38,13 @@ class Polygon:
         #edges as lines
 
     def get_rect(self):
-        topleft = [0, 0] #min poses
-        size = [0, 0] #max poses - min poses
+        xPoses = [point.x for point in self.points]
+        yPoses = [point.y for point in self.points]
 
-        return pygame.Rect(topleft[0], topleft[1], size[0], size[1])
+        topleft = [min(xPoses), min(yPoses)] #min poses
+        size = [max(xPoses) - topleft[0], max(yPoses) - topleft[1]]
+
+        return pygame.Rect(topleft, size)
     
     def collide_point(self, point):
         Checkline = [Vector2(0, point.y), Vector2(point.x, point.y)]  
@@ -65,6 +70,7 @@ class Polygon:
             if round(interp, 4) > 1 or round(interp, 4) < 0:
                 continue
 
+
             if position.x >= Checkline[0].x and position.x <= Checkline[1].x:
                 intersections.append(position)
                 Debug.circle(position, 2, 0)
@@ -87,7 +93,10 @@ class Polygon:
     
     def collisionResolve(self, point):
         '''return closest point and normal vec'''
-        if self.collide_point(point):#if True:
+        #additional collision step for performance
+        collideRect = self.rect.collidepoint(point)
+        
+        if self.collide_point(point) and collideRect:
             points = []
             normal = []
             distances = []
@@ -127,6 +136,8 @@ class Polygon:
         #not that important - check if point is on the line
         minPos = [min((edge[0].x, edge[1].x)), min((edge[0].y, edge[1].y))]
         maxPos = [max((edge[0].x, edge[1].x)), max((edge[0].y, edge[1].y))]
+        if self.edges.index(edge) == 3:
+            print(normal)
         if ClosestPos.x < minPos[0]:
             ClosestPos.x = minPos[0]
 
@@ -142,8 +153,13 @@ class Polygon:
         return [ClosestPos, VecNormal]
 
     def collide_polygon(self, polygon):
-        #run collide_point for every point of the other polygon
-        pass
+        '''
+        for every point in other polygon class collide_point
+        return colliding points 
+        Could be used for softbodies collision later
+        '''
+        
+        ...
 
 
 class PolygonJson(Polygon):
