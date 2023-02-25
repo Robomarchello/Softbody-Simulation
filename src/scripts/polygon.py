@@ -47,7 +47,7 @@ class Polygon:
         return pygame.Rect(topleft, size)
     
     def collide_point(self, point):
-        Checkline = [Vector2(0, point.y), Vector2(point.x, point.y)]  
+        Checkline = [Vector2(self.rect.left, point.y), Vector2(point.x, point.y)]  
         
         intersections = []
         for edgeLine in self.edges:
@@ -108,6 +108,8 @@ class Polygon:
                 distances.append((edgeClosest[0] - point).magnitude())
                 
                 Debug.circle(edgeClosest[0], 3, 0, (0, 255, 0))
+                
+
 
             edgeIndex = distances.index(min(distances))
             closestPoint = points[edgeIndex]
@@ -136,8 +138,8 @@ class Polygon:
         #not that important - check if point is on the line
         minPos = [min((edge[0].x, edge[1].x)), min((edge[0].y, edge[1].y))]
         maxPos = [max((edge[0].x, edge[1].x)), max((edge[0].y, edge[1].y))]
-        if self.edges.index(edge) == 3:
-            print(normal)
+        #if self.edges.index(edge) == 3:
+        #    print(normal)
         if ClosestPos.x < minPos[0]:
             ClosestPos.x = minPos[0]
 

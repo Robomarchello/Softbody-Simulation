@@ -59,5 +59,5 @@ class App():
 
             Debug.draw(screen)
             self.HardBall.draw(screen)
-
+        
             pygame.display.update()
