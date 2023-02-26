@@ -4,8 +4,6 @@ from json import loads
 from .debug import Debug
 
 
-#could be also named obstacle.py
-#also, thats for static objects, could also want collision between two softbodies
 class Polygon:
     def __init__(self, points, indices):
         self.points = points
@@ -19,6 +17,20 @@ class Polygon:
             self.edges.append(edge)
 
         self.rect = self.get_rect()
+    
+    def update(self, points):
+        '''
+        update the polygon points, rect...
+        used for softbody - softbody collision
+        '''
+        self.points = points
+        self.points = [Vector2(point) for point in self.points]
+
+        self.edges = []
+        for index in self.indices:
+            edge = [self.points[index[0]], self.points[index[1]]]
+            
+            self.edges.append(edge)
 
     def indicesToEdges(self, indices):
         edges = []
@@ -171,7 +183,7 @@ class PolygonJson(Polygon):
         with open(file, 'r') as polyFile:
             data = loads(polyFile.read())
 
-            self.points = data['points']
-            self.edges = data['edges']
+            points = data['points']
+            edges = data['edges']
 
-        super().__init__(self.points, self.edges)
+        super().__init__(points, edges)

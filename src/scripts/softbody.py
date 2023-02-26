@@ -112,15 +112,23 @@ class SoftbodyBall(PressureSoftbody):
                 Point(position, mass, damping, False)
             )
         
+        indices = []
         for index, point in enumerate(self.points):
             nextPoint = index + 1
             if nextPoint >= len(self.points):
                 nextPoint = 0
-
+            
+            indices.append([index, nextPoint])
             self.springs.append(
                 Spring(point, self.points[nextPoint],
                     stiffness, sideLength, damping))
-
+        
+        #make polygon stuff here
+        #indices list going to help
+        #self.polygon = polygon
+        #update polygon in def update
+        #this stuff is kinda hard to make (code) clean
+        #so this is pretty stressful😬
 
 
 
