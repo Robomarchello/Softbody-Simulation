@@ -1,7 +1,8 @@
 import pygame
 from pygame import Vector2
 from json import loads
-from .debug import Debug
+from debug import Debug
+#from .debug import Debug
 
 
 class Polygon:
@@ -31,6 +32,8 @@ class Polygon:
             edge = [self.points[index[0]], self.points[index[1]]]
             
             self.edges.append(edge)
+
+        self.rect = self.get_rect()
 
     def indicesToEdges(self, indices):
         edges = []
@@ -175,8 +178,15 @@ class Polygon:
         Could be used for softbodies collision later
         '''
         
-        ...
+        collisions = []
 
+        for point in polygon.points:
+            collision = self.collisionResolve(point)
+            
+            if collision != False:
+                collisions.append(collision)
+
+        return collisions
 
 class PolygonJson(Polygon):
     def __init__(self, file):

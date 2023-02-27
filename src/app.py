@@ -18,7 +18,6 @@ class App():
         damping = 0.96
 
         #-- polygon --
-
         self.polygons = [PolygonJson('src/assets/polygon.json')]
 
         self.softbody = SoftbodyBall(self.ScreenSize, (150, 50), 30, 16,

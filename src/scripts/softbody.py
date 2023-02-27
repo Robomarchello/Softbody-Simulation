@@ -89,6 +89,18 @@ class PressureSoftbody:
 
         spring.DrawNormal(PressureForce)
 
+    '''
+    def UpdateCollision(self):
+        for obstacle in self.obstacles:
+            collisions = self.polygon.collide_polygon(obstacle)
+
+            for collision in collisions:
+                point = collision[3]
+                point.position = collision[1]     
+                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
+                point.velocity *= 0
+                '''
+
 
 class SoftbodyBall(PressureSoftbody):
     def __init__(self, ScreenSize, center, radius, sides,
@@ -123,12 +135,12 @@ class SoftbodyBall(PressureSoftbody):
                 Spring(point, self.points[nextPoint],
                     stiffness, sideLength, damping))
         
-        #make polygon stuff here
-        #indices list going to help
-        #self.polygon = polygon
-        #update polygon in def update
-        #this stuff is kinda hard to make (code) clean
-        #so this is pretty stressful😬
+            #make polygon stuff here
+            #indices list going to help
+            #self.polygon = polygon
+            #update polygon in def update
+            #this stuff is kinda hard to make (code) clean
+            #so this is pretty stressful😬
 
 
 
