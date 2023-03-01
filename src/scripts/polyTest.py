@@ -11,13 +11,11 @@ class App():
     def __init__(self, ScreenSize, caption, fps):
         self.ScreenSize = ScreenSize
         
-        self.poly1 = PolygonJson('src/assets/polygon.json') 
-        self.poly2 = PolygonJson('src/assets/polygon1.json') 
+        self.poly = PolygonJson('src/assets/polygon1.json') 
         
         self.screen = pygame.display.set_mode(ScreenSize)
         pygame.display.set_caption(caption)
 
-        self.previous = self.poly1.points[1]
         self.clock = pygame.time.Clock()
         self.fps = fps
 
@@ -27,29 +25,25 @@ class App():
             self.clock.tick(self.fps)
             screen.fill((255, 255, 255))
 
-            self.poly1.draw(screen)
-            self.poly2.draw(screen)
+            position = Mouse.position
 
-            movement = Mouse.position  - self.previous
-            points = []  
-            for point in self.poly1.points:
-                points.append(point + movement)
-            self.previous = Mouse.position.copy()
+            self.poly.draw(screen)
+            pygame.draw.circle(screen, (255, 0, 0), position, 3)
 
-            self.poly1.update(points)
+            if self.poly.collide_point(position):
+                closest = []
+                distances = []
+                for edge in self.poly.edges:
+                    edgeClosest = self.poly.getClosest(position, edge)
+                    closest.append(edgeClosest)
+                    distances.append((edgeClosest[0] - position).magnitude())
 
-            collision1 = self.poly1.collide_polygon(self.poly2)
-            collision2 = self.poly2.collide_polygon(self.poly1)
-            
-            if collision1 != []:
-                print(collision1)
+                distanceMin = min(distances)
+                index = distances.index(distanceMin)
+                pygame.draw.circle(screen, (255, 0, 0), closest[index][0], 3)
 
-            if collision2 != []:
-                print(collision2)
+                # Move points here later
 
-            #if collision2 != []:
-            #    print(collision2)
-            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()

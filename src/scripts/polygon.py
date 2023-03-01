@@ -36,6 +36,7 @@ class Polygon:
         self.rect = self.get_rect()
 
     def indicesToEdges(self, indices):
+        '''updating edges'''
         edges = []
 
         for index in indices:
@@ -48,10 +49,6 @@ class Polygon:
     def draw(self, screen):
         pygame.draw.polygon(screen, (0, 0, 0), self.points, 1)
 
-        #or draw
-        #points as circles
-        #edges as lines
-
     def get_rect(self):
         xPoses = [point.x for point in self.points]
         yPoses = [point.y for point in self.points]
@@ -62,6 +59,7 @@ class Polygon:
         return pygame.Rect(topleft, size)
     
     def collide_point(self, point):
+        '''point - polygon collision check'''
         Checkline = [Vector2(self.rect.left, point.y), Vector2(point.x, point.y)]  
         
         intersections = []
@@ -110,9 +108,7 @@ class Polygon:
         '''return closest point and normal vec'''
         #additional collision step for performance
         collideRect = self.rect.collidepoint(point)
-        #TRY THIS
-        #if collideRect:
-        #collidepolygon = self.collide_point(point)
+
         if collideRect and self.collide_point(point):
             points = []
             normal = []
@@ -125,8 +121,6 @@ class Polygon:
                 distances.append((edgeClosest[0] - point).magnitude())
                 
                 Debug.circle(edgeClosest[0], 3, 0, (0, 255, 0))
-                
-
 
             edgeIndex = distances.index(min(distances))
             closestPoint = points[edgeIndex]
@@ -155,8 +149,7 @@ class Polygon:
         #not that important - check if point is on the line
         minPos = [min((edge[0].x, edge[1].x)), min((edge[0].y, edge[1].y))]
         maxPos = [max((edge[0].x, edge[1].x)), max((edge[0].y, edge[1].y))]
-        #if self.edges.index(edge) == 3:
-        #    print(normal)
+
         if ClosestPos.x < minPos[0]:
             ClosestPos.x = minPos[0]
 
