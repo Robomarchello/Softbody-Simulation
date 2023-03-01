@@ -3,7 +3,7 @@ from pygame import Vector2
 from pygame.locals import *
 from mouse import Mouse
 from polygon import PolygonJson
-
+from copy import copy
 
 pygame.init()
 
@@ -30,6 +30,8 @@ class App():
             self.poly.draw(screen)
             pygame.draw.circle(screen, (255, 0, 0), position, 3)
 
+            #if going to be used not only for softbodies, then add polygon.static
+            #and if it's static, then resolve only softbody.
             if self.poly.collide_point(position):
                 closest = []
                 distances = []
@@ -38,11 +40,25 @@ class App():
                     closest.append(edgeClosest)
                     distances.append((edgeClosest[0] - position).magnitude())
 
-                distanceMin = min(distances)
-                index = distances.index(distanceMin)
+                distance = min(distances)
+                index = distances.index(distance)
                 pygame.draw.circle(screen, (255, 0, 0), closest[index][0], 3)
+                edge = self.poly.edges[index]
 
-                # Move points here later
+                interp = (closest[index][0].x - edge[0].x) / (edge[1].x - edge[0].x)
+                
+                normal = Vector2(closest[index][1].y, -closest[index][1].x)
+                newEdge = [
+                    edge[0] - normal * distance * interp,
+                    edge[1] - normal * distance * (1 - interp)
+                ]
+                newVec = newEdge[1] - newEdge[0]
+
+                pygame.draw.line(screen, (150, 150, 150), newEdge[0], newEdge[1])
+
+                pointNew = newVec * interp + newEdge[0]
+                pygame.draw.circle(screen, (0, 255, 0), pointNew, 1)
+
 
             for event in pygame.event.get():
                 if event.type == QUIT:
