@@ -1,8 +1,7 @@
 import pygame
 from pygame import Vector2
 from json import loads
-from debug import Debug
-#from .debug import Debug
+from .debug import Debug
 
 
 class Polygon:
@@ -18,6 +17,8 @@ class Polygon:
             self.edges.append(edge)
 
         self.rect = self.get_rect()
+
+        self.static = True
     
     def update(self, points):
         '''
@@ -104,8 +105,7 @@ class Polygon:
         
         return False 
     
-    def collisionResolve(self, point):
-        '''return closest point and normal vec'''
+    '''def collisionResolve(self, point):
         #additional collision step for performance
         collideRect = self.rect.collidepoint(point)
 
@@ -129,8 +129,56 @@ class Polygon:
             return [edgeIndex, closestPoint, normalVec]
 
         #no collision
-        return False
+        return False'''
 
+    def CollisionResolve(self, point):
+        '''return closest point and normal vec'''
+        #additional collision step for performance
+        collideRect = self.rect.collidepoint(point)
+
+        if collideRect and self.collide_point(point):
+            points = []
+            normals = []
+            distances = []
+            for edge in self.edges:
+                edgeClosest = self.getClosest(point, edge)
+                points.append(edgeClosest[0])
+                normals.append(edgeClosest[1])
+                distances.append((edgeClosest[0] - point).magnitude())
+
+            distance = min(distances)
+            index = distances.index(distance)
+            edge = self.edges[index]
+
+            if self.static:
+                edgeIndex = distances.index(min(distances))
+                closestPoint = points[edgeIndex]
+                normalVec = normal[edgeIndex]
+
+                #apply here???
+                return [edgeIndex, closestPoint, normalVec, None]
+
+            interp = (points[index].x - edge[0].x) / (edge[1].x - edge[0].x)
+                
+            normal = Vector2(normals[index].y, -normals[index].x)
+            #if not polygon.static:
+            newEdge = [
+                edge[0] - normal * distance * interp,
+                edge[1] - normal * distance * (1 - interp)
+            ]
+            newVec = newEdge[1] - newEdge[0]
+
+            pointNew = newVec * interp + newEdge[0]
+            #---
+
+            pointVel = normal
+            #if not polygon.static:
+            edgeVel = -normal
+            #apply here???
+            return [edgeIndex, pointNew, pointVel, edgeVel]
+
+        return False
+        
     def getClosest(self, position, edge):
           #Hope you get this
         '''Returns the closest point on a line segment from point'''

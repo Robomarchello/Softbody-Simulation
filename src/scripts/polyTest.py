@@ -32,6 +32,7 @@ class App():
 
             #if going to be used not only for softbodies, then add polygon.static
             #and if it's static, then resolve only softbody.
+            #also add rect collision chech back
             if self.poly.collide_point(position):
                 closest = []
                 distances = []
@@ -42,22 +43,31 @@ class App():
 
                 distance = min(distances)
                 index = distances.index(distance)
-                pygame.draw.circle(screen, (255, 0, 0), closest[index][0], 3)
                 edge = self.poly.edges[index]
 
                 interp = (closest[index][0].x - edge[0].x) / (edge[1].x - edge[0].x)
                 
                 normal = Vector2(closest[index][1].y, -closest[index][1].x)
+                #if not polygon.static:
                 newEdge = [
                     edge[0] - normal * distance * interp,
                     edge[1] - normal * distance * (1 - interp)
                 ]
                 newVec = newEdge[1] - newEdge[0]
 
-                pygame.draw.line(screen, (150, 150, 150), newEdge[0], newEdge[1])
-
                 pointNew = newVec * interp + newEdge[0]
-                pygame.draw.circle(screen, (0, 255, 0), pointNew, 1)
+                #---
+
+                pygame.draw.line(screen, (150, 150, 150), newEdge[0], newEdge[1])
+                pygame.draw.circle(screen, (0, 255, 0), pointNew, 2)
+
+                #find velocities here
+                #Use some better way (later💋)
+                pointVel = normal
+                #if not polygon.static:
+                edgeVel = -normal
+
+                #return [pointVel, edgeVel]
 
 
             for event in pygame.event.get():
