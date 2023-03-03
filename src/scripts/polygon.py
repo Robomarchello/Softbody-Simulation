@@ -5,7 +5,7 @@ from .debug import Debug
 
 
 class Polygon:
-    def __init__(self, points, indices):
+    def __init__(self, points, indices, static=True):
         self.points = points
         self.points = [Vector2(point) for point in self.points]
         
@@ -18,14 +18,30 @@ class Polygon:
 
         self.rect = self.get_rect()
 
-        self.static = True
+        self.static = static
     
     def update(self, points):
         '''
-        update the polygon points, rect...
+        update ALL polygon points, rect...
         used for softbody - softbody collision
         '''
         self.points = points
+        self.points = [Vector2(point) for point in self.points]
+
+        self.edges = []
+        for index in self.indices:
+            edge = [self.points[index[0]], self.points[index[1]]]
+            
+            self.edges.append(edge)
+
+        self.rect = self.get_rect()
+
+    def update_point(self, index, point):
+        '''
+        update ALL polygon points, rect...
+        used for softbody - softbody collision
+        '''
+        self.points[index] = point
         self.points = [Vector2(point) for point in self.points]
 
         self.edges = []
@@ -131,7 +147,7 @@ class Polygon:
         #no collision
         return False'''
 
-    def CollisionResolve(self, point):
+    def collisionResolve(self, point):#, edge):
         '''return closest point and normal vec'''
         #additional collision step for performance
         collideRect = self.rect.collidepoint(point)
@@ -150,10 +166,10 @@ class Polygon:
             index = distances.index(distance)
             edge = self.edges[index]
 
+            edgeIndex = distances.index(min(distances))
             if self.static:
-                edgeIndex = distances.index(min(distances))
                 closestPoint = points[edgeIndex]
-                normalVec = normal[edgeIndex]
+                normalVec = normals[edgeIndex]
 
                 #apply here???
                 return [edgeIndex, closestPoint, normalVec, None]
@@ -161,7 +177,6 @@ class Polygon:
             interp = (points[index].x - edge[0].x) / (edge[1].x - edge[0].x)
                 
             normal = Vector2(normals[index].y, -normals[index].x)
-            #if not polygon.static:
             newEdge = [
                 edge[0] - normal * distance * interp,
                 edge[1] - normal * distance * (1 - interp)
@@ -172,7 +187,6 @@ class Polygon:
             #---
 
             pointVel = normal
-            #if not polygon.static:
             edgeVel = -normal
             #apply here???
             return [edgeIndex, pointNew, pointVel, edgeVel]

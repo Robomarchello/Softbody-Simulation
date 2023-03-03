@@ -24,6 +24,10 @@ class App():
                                     mass, stiffness, damping, gas_amount,
                                     self.polygons)
 
+        self.otherSoftbody = SoftbodyBall(self.ScreenSize, (1100, 400), 30, 16,
+                                    mass, stiffness, damping, gas_amount,
+                                    self.polygons)
+
         self.HardBall = HardBall(100, [self.softbody])
         self.Settinger = Settinger(self.softbody)
 
@@ -49,6 +53,7 @@ class App():
 
             self.HardBall.update()
             self.softbody.draw(screen)
+            self.otherSoftbody.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == QUIT:

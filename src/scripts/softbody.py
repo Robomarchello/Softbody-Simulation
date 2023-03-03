@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from .spring import Spring, Point
 from .mouse import Mouse
+from .polygon import Polygon
 from .debug import Debug
 from math import pi, sqrt
 
@@ -16,16 +17,21 @@ class PressureSoftbody:
         self.gas_amount = gas_amount
         self.area = 0
 
+        self.polygon = None
+
         #these are polygon class 
         self.obstacles = obstacles
 
     def draw(self, screen):
         self.update()
+
         for spring in self.springs:
             spring.draw(screen)
 
         for point in self.points:
             point.draw(screen)
+
+        self.polygon.draw(screen)
 
         Debug.text((5, 5), f'Area: {round(self.area, 2)}')
         Debug.text((5, 35), f'Gas Amount: {self.gas_amount}')
@@ -37,11 +43,14 @@ class PressureSoftbody:
             self.ApplyPressure(spring)
             spring.update()
 
-        for point in self.points:
+        points = [point.position for point in self.points]
+        self.polygon.update(points)
+
+        for index, point in enumerate(self.points):
             point.update()
             point.resolveBounds(self.ScreenSize)
 
-            for obstacle in self.obstacles:
+            '''for obstacle in self.obstacles:
                 #[edgeIndex, closestPoint, normalVec]
                 collision = obstacle.collisionResolve(point.position)
 
@@ -49,8 +58,19 @@ class PressureSoftbody:
                     point.position = collision[1]
                     #print(collision[2].elementwise() * point.velocity)         
                     point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
-                    point.velocity *= 0
+                    point.velocity *= 0'''
 
+            for obstacle in self.obstacles:
+                collision = obstacle.collisionResolve(point.position)
+                if collision != False:
+                    colPoint = self.points[index]
+                    colPoint.position = collision[1]        
+
+                    colPoint.acceleration -= collision[2] * colPoint.gravity[1]
+                    colPoint.velocity *= 0
+
+        points = [point.position for point in self.points]
+        self.polygon.update(points)
                     
     def CalculateArea(self):
         '''
@@ -142,6 +162,8 @@ class SoftbodyBall(PressureSoftbody):
             #this stuff is kinda hard to make (code) clean
             #so this is pretty stressful😬
 
+        points = [point.position for point in self.points]
+        self.polygon = Polygon(points, indices, False)
 
 
 # ---- Square softbody below which i don't need right now
