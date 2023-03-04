@@ -3,7 +3,6 @@ from pygame.locals import *
 from .debug import Debug
 
 
-#tried to make this dataclass, but it didn't worked as i expected😭
 class Point:
     def __init__(self, position, mass, damping, static):
         self.position = position

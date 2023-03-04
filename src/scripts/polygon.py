@@ -5,7 +5,7 @@ from .debug import Debug
 
 
 class Polygon:
-    def __init__(self, points, indices, static=True):
+    def __init__(self, points, indices, static=True, softbody=None):
         self.points = points
         self.points = [Vector2(point) for point in self.points]
         
@@ -19,7 +19,8 @@ class Polygon:
         self.rect = self.get_rect()
 
         self.static = static
-    
+        self.softbody = softbody
+
     def update(self, points):
         '''
         update ALL polygon points, rect...
@@ -124,7 +125,9 @@ class Polygon:
         return False 
 
     def collisionResolve(self, point):#, edge):
-        '''return closest point and normal vec'''
+        '''
+        return closest point and normal vec
+        '''
         #additional collision step for performance
         collideRect = self.rect.collidepoint(point)
 
@@ -158,8 +161,8 @@ class Polygon:
             
             normal = Vector2(normals[index].y, -normals[index].x)
             newEdge = [
-                edge[0] - normal * distance * interp,
-                edge[1] - normal * distance * (1 - interp)
+                edge[0] - normal * (distance + 2) * interp,
+                edge[1] - normal * (distance + 2) * (1 - interp)
             ]
             newVec = newEdge[1] - newEdge[0]
 
@@ -167,7 +170,7 @@ class Polygon:
             pointVel = normal
             edgeVel = -normal
 
-            return [edgeIndex, pointNew, pointVel, edgeVel]
+            return [edgeIndex, pointNew, pointVel, edgeVel, newEdge]
 
         return False
         
@@ -177,7 +180,10 @@ class Polygon:
         TargetPointPos = position - edge[0] 
 
         EdgeVec = (edge[1] - edge[0])
-        VecNormal = EdgeVec.normalize()#bug here
+        if EdgeVec == (0, 0):
+            EdgeVec = Vector2(1, 1)
+
+        VecNormal = EdgeVec.normalize()
         normal = Vector2(VecNormal.y, -VecNormal.x)            
 
         distanceX = (EdgeVec - TargetPointPos).x * VecNormal.y

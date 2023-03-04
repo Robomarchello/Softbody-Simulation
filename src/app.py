@@ -27,11 +27,19 @@ class App():
         self.softbody1 = SoftbodyBall(self.ScreenSize, (1100, 400), 30, 16,
                                     mass, stiffness, damping, gas_amount,
                                     self.polygons.copy())
+        self.softbody2 = SoftbodyBall(self.ScreenSize, (700, 400), 30, 16,
+                                    mass, stiffness, damping, gas_amount,
+                                    self.polygons.copy())
 
+        #i know,
         self.softbody.obstacles.append(self.softbody1.polygon)
+        self.softbody.obstacles.append(self.softbody2.polygon)
         self.softbody1.obstacles.append(self.softbody.polygon)
+        self.softbody1.obstacles.append(self.softbody2.polygon)
+        self.softbody2.obstacles.append(self.softbody.polygon)
+        self.softbody2.obstacles.append(self.softbody1.polygon)
 
-        self.HardBall = HardBall(100, [self.softbody])
+        self.HardBall = HardBall(100, [self.softbody, self.softbody1, self.softbody2])
         self.Settinger = Settinger(self.softbody)
 
         self.event_handlers = [Mouse, Debug, self.Settinger]
@@ -57,6 +65,7 @@ class App():
             self.HardBall.update()
             self.softbody.draw(screen)
             self.softbody1.draw(screen)
+            self.softbody2.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == QUIT:

@@ -49,37 +49,58 @@ class PressureSoftbody:
         for index, point in enumerate(self.points):
             point.update()
             point.resolveBounds(self.ScreenSize)
+            self.CollisionResolve(index, point)
 
-            '''for obstacle in self.obstacles:
-                #[edgeIndex, closestPoint, normalVec]
-                collision = obstacle.collisionResolve(point.position)
-
-                if collision != False:
-                    point.position = collision[1]
-                    #print(collision[2].elementwise() * point.velocity)         
-                    point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
-                    point.velocity *= 0'''
-
-            for obstacle in self.obstacles:
-                collision = obstacle.collisionResolve(point.position)
-                if collision != False and obstacle.static:
-                    colPoint = self.points[index]
-                    colPoint.position = collision[1]        
-
-                    colPoint.acceleration -= collision[2] * colPoint.gravity[1]
-                    colPoint.velocity *= 0
-
-                if collision != False and not obstacle.static:
-                    edgeIndex = obstacle.indices[collision[0]]
-                    colPoint = self.points[index]
-                    colPoint.position = collision[1]        
-
-                    colPoint.acceleration -= collision[2] * colPoint.gravity[1]
-                    colPoint.velocity *= 0
 
         points = [point.position for point in self.points]
         self.polygon.update(points)
-                    
+
+    def CollisionResolve(self, index, point):
+        '''
+        Resolving collision with point and colliding edge
+        Btw, there is collision detection 10x simpler, but works the same😭
+        Not sure if which one to use
+        '''
+
+        #simpler collision detection, but works practically the same result
+        '''for obstacle in self.obstacles:
+            #[edgeIndex, closestPoint, normalVec]
+            collision = obstacle.collisionResolve(point.position)
+
+            if collision != False:
+                point.position = collision[1]
+                #print(collision[2].elementwise() * point.velocity)         
+                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
+                point.velocity *= 0'''
+
+        for obstacle in self.obstacles:
+            collision = obstacle.collisionResolve(point.position)
+            if collision != False and obstacle.static:
+                colPoint = self.points[index]
+                colPoint.position = collision[1]        
+
+                colPoint.acceleration -= collision[2] * colPoint.gravity[1]
+                colPoint.velocity *= 0
+
+            if collision != False and not obstacle.static:
+                colPoint = self.points[index]
+                colPoint.position = collision[1]     
+
+                edge = obstacle.softbody.springs[collision[0]]
+
+                edge.point1.position = collision[4][0] 
+                edge.point2.position = collision[4][1]
+
+                edge.point1.acceleration -= collision[3]
+                edge.point2.acceleration += collision[3]
+                edge.point1.velocity *= 0
+                edge.point2.velocity *= 0
+
+                colPoint.acceleration -= collision[2] #* colPoint.gravity[1]
+                colPoint.velocity *= 0
+
+
+
     def CalculateArea(self):
         '''
         Simple, but inaccurate way to calculate area
@@ -117,18 +138,6 @@ class PressureSoftbody:
 
         spring.DrawNormal(PressureForce)
 
-    '''
-    def UpdateCollision(self):
-        for obstacle in self.obstacles:
-            collisions = self.polygon.collide_polygon(obstacle)
-
-            for collision in collisions:
-                point = collision[3]
-                point.position = collision[1]     
-                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
-                point.velocity *= 0
-                '''
-
 
 class SoftbodyBall(PressureSoftbody):
     def __init__(self, ScreenSize, center, radius, sides,
@@ -162,16 +171,9 @@ class SoftbodyBall(PressureSoftbody):
             self.springs.append(
                 Spring(point, self.points[nextPoint],
                     stiffness, sideLength, damping))
-        
-            #make polygon stuff here
-            #indices list going to help
-            #self.polygon = polygon
-            #update polygon in def update
-            #this stuff is kinda hard to make (code) clean
-            #so this is pretty stressful😬
 
         points = [point.position for point in self.points]
-        self.polygon = Polygon(points, indices, False)
+        self.polygon = Polygon(points, indices, False, self)
 
 
 # ---- Square softbody below which i don't need right now
