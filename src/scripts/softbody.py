@@ -62,7 +62,15 @@ class PressureSoftbody:
 
             for obstacle in self.obstacles:
                 collision = obstacle.collisionResolve(point.position)
-                if collision != False:
+                if collision != False and obstacle.static:
+                    colPoint = self.points[index]
+                    colPoint.position = collision[1]        
+
+                    colPoint.acceleration -= collision[2] * colPoint.gravity[1]
+                    colPoint.velocity *= 0
+
+                if collision != False and not obstacle.static:
+                    edgeIndex = obstacle.indices[collision[0]]
                     colPoint = self.points[index]
                     colPoint.position = collision[1]        
 

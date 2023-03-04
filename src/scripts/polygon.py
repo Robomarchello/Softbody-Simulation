@@ -81,6 +81,8 @@ class Polygon:
         
         intersections = []
         for edgeLine in self.edges:
+            if (edgeLine[1] - edgeLine[0]) == (0, 0):
+                continue
             EdgeVec = (edgeLine[1] - edgeLine[0]).normalize()
 
             #check if lines are parallel
@@ -120,32 +122,6 @@ class Polygon:
             return True
         
         return False 
-    
-    '''def collisionResolve(self, point):
-        #additional collision step for performance
-        collideRect = self.rect.collidepoint(point)
-
-        if collideRect and self.collide_point(point):
-            points = []
-            normal = []
-            distances = []
-            for edge in self.edges:
-                edgeClosest = self.getClosest(point, edge)
-                
-                points.append(edgeClosest[0])
-                normal.append(edgeClosest[1])
-                distances.append((edgeClosest[0] - point).magnitude())
-                
-                Debug.circle(edgeClosest[0], 3, 0, (0, 255, 0))
-
-            edgeIndex = distances.index(min(distances))
-            closestPoint = points[edgeIndex]
-            normalVec = normal[edgeIndex]
-
-            return [edgeIndex, closestPoint, normalVec]
-
-        #no collision
-        return False'''
 
     def collisionResolve(self, point):#, edge):
         '''return closest point and normal vec'''
@@ -171,11 +147,15 @@ class Polygon:
                 closestPoint = points[edgeIndex]
                 normalVec = normals[edgeIndex]
 
-                #apply here???
                 return [edgeIndex, closestPoint, normalVec, None]
 
-            interp = (points[index].x - edge[0].x) / (edge[1].x - edge[0].x)
-                
+            #IF NOT STATIC:
+            xLen = (edge[1].x - edge[0].x)
+            if xLen == 0:
+                interp = 0.5
+            else:
+                interp = (points[index].x - edge[0].x) / xLen
+            
             normal = Vector2(normals[index].y, -normals[index].x)
             newEdge = [
                 edge[0] - normal * distance * interp,
@@ -184,11 +164,9 @@ class Polygon:
             newVec = newEdge[1] - newEdge[0]
 
             pointNew = newVec * interp + newEdge[0]
-            #---
-
             pointVel = normal
             edgeVel = -normal
-            #apply here???
+
             return [edgeIndex, pointNew, pointVel, edgeVel]
 
         return False
@@ -199,7 +177,7 @@ class Polygon:
         TargetPointPos = position - edge[0] 
 
         EdgeVec = (edge[1] - edge[0])
-        VecNormal = EdgeVec.normalize()
+        VecNormal = EdgeVec.normalize()#bug here
         normal = Vector2(VecNormal.y, -VecNormal.x)            
 
         distanceX = (EdgeVec - TargetPointPos).x * VecNormal.y
