@@ -2,6 +2,7 @@ import pygame
 from .mouse import Mouse
 from .debug import Debug
 
+
 #not separate simulation, but for interaction with softbodies
 class HardBall:
     def __init__(self, radius, softbodies):
@@ -14,6 +15,10 @@ class HardBall:
 
     def update(self):
         for softbody in self.softbodies:
+            inside = softbody.polygon.collide_point(self.position)
+            if inside:
+                continue
+            
             for point in softbody.points:
                 distanceVec = self.position - point.position
                 normalDist = distanceVec.normalize()
@@ -25,6 +30,7 @@ class HardBall:
                     point.acceleration -= SepForce
                     #not sure if this is the best solution, but works fine
                     point.position = self.position - normalDist * self.radius
+
 
 from pygame.locals import *
 

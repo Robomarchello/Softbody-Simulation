@@ -84,13 +84,14 @@ class Polygon:
         for edgeLine in self.edges:
             if (edgeLine[1] - edgeLine[0]) == (0, 0):
                 continue
+
             EdgeVec = (edgeLine[1] - edgeLine[0]).normalize()
 
             #check if lines are parallel
             if edgeLine[0].y == edgeLine[1].y:
                 continue
 
-            #0 length check
+            #0 length check 
             if EdgeVec.y == 0:
                 continue
             
@@ -103,12 +104,11 @@ class Polygon:
             if round(interp, 4) > 1 or round(interp, 4) < 0:
                 continue
 
-
             if position.x >= Checkline[0].x and position.x <= Checkline[1].x:
                 intersections.append(position)
-                Debug.circle(position, 2, 0)
+                #Debug.circle(position, 2, 0)
 
-        Debug.text((5, 5), str(len(intersections)))
+        #Debug.text((5, 5), str(len(intersections)))
 
         result = []
         for intersection in intersections:
@@ -119,12 +119,11 @@ class Polygon:
                 result.append(intersection)
 
         if (len(result) % 2) == 1:
-            #self.collisionResolve(point)
             return True
         
         return False 
 
-    def collisionResolve(self, point):#, edge):
+    def collisionResolve(self, point):
         '''
         return closest point and normal vec
         '''
@@ -196,17 +195,11 @@ class Polygon:
         minPos = [min((edge[0].x, edge[1].x)), min((edge[0].y, edge[1].y))]
         maxPos = [max((edge[0].x, edge[1].x)), max((edge[0].y, edge[1].y))]
 
-        if ClosestPos.x < minPos[0]:
+        if ClosestPos.x < minPos[0] or ClosestPos.x > maxPos[0]:
             ClosestPos.x = minPos[0]
 
-        elif ClosestPos.x > maxPos[0]:
-            ClosestPos.x = maxPos[0]
-
-        if ClosestPos.y < minPos[1]:
+        if ClosestPos.y < minPos[1] or ClosestPos.y > maxPos[1]:
             ClosestPos.y = minPos[1]
-
-        elif ClosestPos.y > maxPos[1]:
-            ClosestPos.y = maxPos[1]
 
         return [ClosestPos, VecNormal]
 
@@ -215,8 +208,7 @@ class Polygon:
         for every point in other polygon class collide_point
         return colliding points 
         Could be used for softbodies collision later
-        '''
-        
+        ''' 
         collisions = []
 
         for point in polygon.points:
@@ -226,6 +218,7 @@ class Polygon:
                 collisions.append(collision)
 
         return collisions
+
 
 class PolygonJson(Polygon):
     def __init__(self, file):

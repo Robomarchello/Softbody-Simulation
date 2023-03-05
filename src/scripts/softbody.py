@@ -99,14 +99,12 @@ class PressureSoftbody:
                 colPoint.acceleration -= collision[2] #* colPoint.gravity[1]
                 colPoint.velocity *= 0
 
-
-
     def CalculateArea(self):
         '''
         Simple, but inaccurate way to calculate area
         *Probably* will change it
         '''
-        #i don't like that making 2 loops for x and y poses
+        # i don't like that making 2 loops for x and y poses
         xPoses = [point.position.x for point in self.points]
         yPoses = [point.position.y for point in self.points]
 
@@ -129,12 +127,12 @@ class PressureSoftbody:
         '''
         length = spring.length
         normalVec = spring.GetNormal()
-        OneOverArea = 1 / self.area #smaller the the area, stronger the force
+        OneOverArea = 1 / self.area  # smaller the the area, stronger the force
 
         PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
 
-        spring.point1.acceleration += PressureForce# / spring.point1.mass
-        spring.point2.acceleration += PressureForce# / spring.point2.mass
+        spring.point1.acceleration += PressureForce # / spring.point1.mass
+        spring.point2.acceleration += PressureForce # / spring.point2.mass
 
         spring.DrawNormal(PressureForce)
 
