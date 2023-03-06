@@ -37,22 +37,6 @@ class Polygon:
 
         self.rect = self.get_rect()
 
-    def update_point(self, index, point):
-        '''
-        update ALL polygon points, rect...
-        used for softbody - softbody collision
-        '''
-        self.points[index] = point
-        self.points = [Vector2(point) for point in self.points]
-
-        self.edges = []
-        for index in self.indices:
-            edge = [self.points[index[0]], self.points[index[1]]]
-            
-            self.edges.append(edge)
-
-        self.rect = self.get_rect()
-
     def indicesToEdges(self, indices):
         '''updating edges'''
         edges = []
@@ -82,25 +66,23 @@ class Polygon:
         
         intersections = []
         for edgeLine in self.edges:
-            if (edgeLine[1] - edgeLine[0]) == (0, 0):
-                continue
+            EdgeVec = (edgeLine[1] - edgeLine[0])
 
-            EdgeVec = (edgeLine[1] - edgeLine[0]).normalize()
-
-            #check if lines are parallel
-            if edgeLine[0].y == edgeLine[1].y:
+            if EdgeVec == (0, 0):
                 continue
 
             #0 length check 
             if EdgeVec.y == 0:
                 continue
+ 
+            EdgeNormal = (edgeLine[1] - edgeLine[0]).normalize()
             
             HeightBtwn = Checkline[0].y - edgeLine[0].y
                 
-            position = EdgeVec * HeightBtwn / EdgeVec.y
+            position = EdgeNormal * HeightBtwn / EdgeNormal.y
             position += edgeLine[0]
 
-            interp = (position[1] - edgeLine[0].y) / (edgeLine[1].y - edgeLine[0].y)
+            interp = (position[1] - edgeLine[0].y) / EdgeVec[1]
             if round(interp, 4) > 1 or round(interp, 4) < 0:
                 continue
 

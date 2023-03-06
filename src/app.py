@@ -13,11 +13,10 @@ class App():
         pygame.display.set_caption(caption)
 
         self.SoftbodyHandler = SoftbodyHandler(self.ScreenSize)
+        self.polygons = self.SoftbodyHandler.polygons
 
         self.HardBall = HardBall(100, self.SoftbodyHandler.softbodies)
         self.Settinger = Settinger(self.SoftbodyHandler.softbodies[0])
-
-        self.polygons = self.SoftbodyHandler.polygons
 
         self.event_handlers = [Mouse, Debug, self.Settinger]
 

@@ -66,7 +66,6 @@ class Spring:
                         self.point2.position, 3)
 
     def update(self):
-        #every frame and use this length everywhere
         self.length = self.GetLength()
         self.normalVec = self.GetNormal()
         SpringForce = self.GetSpringForce()
@@ -78,7 +77,7 @@ class Spring:
         distance = self.point1.position - self.point2.position
         length = self.length
         if length != 0:
-            normalVec = distance.normalize()
+            normalVec = distance / length  #.normalize()
                 
             springForce = (-self.stiffness * (length - self.restLength))
             

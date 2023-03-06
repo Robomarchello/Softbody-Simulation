@@ -51,39 +51,25 @@ class PressureSoftbody:
             point.resolveBounds(self.ScreenSize)
             self.CollisionResolve(index, point)
 
-
         points = [point.position for point in self.points]
         self.polygon.update(points)
 
     def CollisionResolve(self, index, point):
         '''
         Resolving collision with point and colliding edge
-        Btw, there is collision detection 10x simpler, but works the same😭
-        Not sure if which one to use
         '''
-
-        #simpler collision detection, but works practically the same result
-        '''for obstacle in self.obstacles:
-            #[edgeIndex, closestPoint, normalVec]
-            collision = obstacle.collisionResolve(point.position)
-
-            if collision != False:
-                point.position = collision[1]
-                #print(collision[2].elementwise() * point.velocity)         
-                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
-                point.velocity *= 0'''
 
         for obstacle in self.obstacles:
             collision = obstacle.collisionResolve(point.position)
-            if collision != False and obstacle.static:
-                colPoint = self.points[index]
+            colPoint = self.points[index]
+
+            if collision != False and obstacle.static: 
                 colPoint.position = collision[1]        
 
                 colPoint.acceleration -= collision[2] * colPoint.gravity[1]
                 colPoint.velocity *= 0
 
             if collision != False and not obstacle.static:
-                colPoint = self.points[index]
                 colPoint.position = collision[1]     
 
                 edge = obstacle.softbody.springs[collision[0]]
@@ -96,8 +82,20 @@ class PressureSoftbody:
                 edge.point1.velocity *= 0
                 edge.point2.velocity *= 0
 
-                colPoint.acceleration -= collision[2] #* colPoint.gravity[1]
+                colPoint.acceleration -= collision[2]
                 colPoint.velocity *= 0
+
+        #simpler collision detection, but works practically the same result
+        '''for obstacle in self.obstacles:
+            #[edgeIndex, closestPoint, normalVec]
+            collision = obstacle.collisionResolve(point.position)
+
+            if collision != False:
+                point.position = collision[1]
+                #print(collision[2].elementwise() * point.velocity)         
+                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
+                point.velocity *= 0
+        '''
 
     def CalculateArea(self):
         '''
@@ -127,7 +125,7 @@ class PressureSoftbody:
         '''
         length = spring.length
         normalVec = spring.GetNormal()
-        OneOverArea = 1 / self.area  # smaller the the area, stronger the force
+        OneOverArea = 1 / self.area
 
         PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
 
