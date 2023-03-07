@@ -15,7 +15,7 @@ class App():
         self.SoftbodyHandler = SoftbodyHandler(self.ScreenSize)
         self.polygons = self.SoftbodyHandler.polygons
 
-        self.HardBall = HardBall(100, self.SoftbodyHandler.softbodies)
+        self.HardBall = HardBall(75, self.SoftbodyHandler.softbodies)
         self.Settinger = Settinger(self.SoftbodyHandler.softbodies[0])
 
         self.event_handlers = [Mouse, Debug, self.Settinger]
