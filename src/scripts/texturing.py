@@ -32,8 +32,6 @@ class App():
         self.fps = fps
 
     def TextureMap(self):
-        #shouldn't be done every frame
-        #guess that called caching?
         MappedPixels = numpy.zeros(self.textureRect.size, int)
         pixels = pygame.surfarray.array2d(self.texture)
 
@@ -48,13 +46,11 @@ class App():
         sideRinterp = sideR * yPair + self.textureTri[1]
 
         segBetween = numpy.subtract(sideRinterp, sideLinterp)
-        allSegments = numpy.repeat(segBetween, xInterps.shape[0], axis=0)
-        tileX = numpy.tile(xInterps, segBetween.shape[0])
-        tileXPair = numpy.repeat(tileX, 2).reshape(tileX.shape[0], 2)
         
         sideLAll = numpy.repeat(sideLinterp, xInterps.shape[0], axis=0)
+        positions = numpy.kron(xInterps, segBetween).reshape(sideLAll.shape) + sideLAll
+        positions = numpy.int_(positions)
 
-        positions = numpy.int_(numpy.multiply(allSegments, tileXPair) + sideLAll)
         xPoses = numpy.take(positions, 0, axis=1) - 1
         yPoses = numpy.take(positions, 1, axis=1) - 1
         newPixels = numpy.array(pixels)[xPoses, yPoses]
@@ -68,23 +64,23 @@ class App():
         sideRinterp = sideR * yPair + self.mappedTri[1] - self.textureRect.topleft
 
         segBetween = numpy.subtract(sideRinterp, sideLinterp)
-        allSegments = numpy.repeat(segBetween, xInterps.shape[0], axis=0)
-        tileX = numpy.tile(xInterps, segBetween.shape[0])
-        tileXPair = numpy.repeat(tileX, 2).reshape(tileX.shape[0], 2)
-        
+
         sideLAll = numpy.repeat(sideLinterp, xInterps.shape[0], axis=0)
 
-        positions = numpy.int_(numpy.multiply(allSegments, tileXPair) + sideLAll)
+        positions = numpy.kron(xInterps, segBetween).reshape(sideLAll.shape) + sideLAll
+        positions = numpy.int_(positions)
+
         xPoses = numpy.take(positions, 0, axis=1) - 1
         yPoses = numpy.take(positions, 1, axis=1) - 1
 
         MappedPixels[xPoses, yPoses] = newPixels
 
-        surf = pygame.Surface(self.textureRect.size)  # (MappedPixels.shape)
+        surf = pygame.Surface(self.textureRect.size)
         pygame.surfarray.blit_array(surf, MappedPixels)
         
         return surf
-
+    
+        #numpy.savetxt('debug.txt', output, fmt='%i', delimiter='\t')
 
     def loop(self):
         screen = self.screen
