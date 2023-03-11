@@ -32,7 +32,9 @@ class App():
         self.fps = fps
 
     def TextureMap(self):
-        MappedPixels = numpy.zeros((500, 500), int)
+        #shouldn't be done every frame
+        #guess that called caching?
+        MappedPixels = numpy.zeros(self.textureRect.size, int)
         pixels = pygame.surfarray.array2d(self.texture)
 
         xInterps = numpy.linspace(0.0, 1.0, self.textureRect.width)
@@ -56,14 +58,14 @@ class App():
         xPoses = numpy.take(positions, 0, axis=1) - 1
         yPoses = numpy.take(positions, 1, axis=1) - 1
         newPixels = numpy.array(pixels)[xPoses, yPoses]
-        #newPixels = newPixels.reshape(TextureShape)
+
         #  ---- 
         sideL = numpy.subtract(self.mappedTri[0], self.mappedTri[1])
         sideR = numpy.subtract(self.mappedTri[2], self.mappedTri[1])
 
         yPair = numpy.repeat(yInterps, 2).reshape(yInterps.shape[0], 2)
-        sideLinterp = sideL * yPair + self.mappedTri[1]
-        sideRinterp = sideR * yPair + self.mappedTri[1]
+        sideLinterp = sideL * yPair + self.mappedTri[1] - self.textureRect.topleft
+        sideRinterp = sideR * yPair + self.mappedTri[1] - self.textureRect.topleft
 
         segBetween = numpy.subtract(sideRinterp, sideLinterp)
         allSegments = numpy.repeat(segBetween, xInterps.shape[0], axis=0)
@@ -75,11 +77,11 @@ class App():
         positions = numpy.int_(numpy.multiply(allSegments, tileXPair) + sideLAll)
         xPoses = numpy.take(positions, 0, axis=1) - 1
         yPoses = numpy.take(positions, 1, axis=1) - 1
-        #numpy.savetxt('debug.txt', newPixels, fmt='%i', delimiter='\t')
-        surf = pygame.Surface(MappedPixels.shape)
+
         MappedPixels[xPoses, yPoses] = newPixels
+
+        surf = pygame.Surface(self.textureRect.size)  # (MappedPixels.shape)
         pygame.surfarray.blit_array(surf, MappedPixels)
-        #newPix[positions] = newPixels
         
         return surf
 
@@ -109,7 +111,8 @@ class App():
             pygame.draw.rect(screen, (255, 0, 0), self.textureRect, 2)
 
             if self.output != None:
-                screen.blit(self.output, (0, 160))
+                #self.output.set_alpha(100)
+                screen.blit(self.output, self.textureRect.topleft)
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -118,7 +121,8 @@ class App():
 
                 Mouse.handle_event(event)
 
+            pygame.display.set_caption(str(round(self.clock.get_fps())))
             pygame.display.update()
 
 
-App((1280, 720), 'Texturing', 60).loop()
+App((1280, 720), 'Texturing', 0).loop()
