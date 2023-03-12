@@ -22,7 +22,7 @@ class SoftbodyHandler:
             )
         )
 
-        self.softbodies.append(
+        '''self.softbodies.append(
             SoftbodyBall(
             self.ScreenSize, (1100, 400), 30, 16,
             mass, stiffness, damping, gas_amount,
@@ -36,7 +36,7 @@ class SoftbodyHandler:
             mass, stiffness, damping, gas_amount,
             self.polygons.copy()
             )
-        )
+        )'''
 
         softPolygons = [softbody.polygon for softbody in self.softbodies]
         for index, softbody in enumerate(self.softbodies):

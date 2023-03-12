@@ -4,6 +4,7 @@ from .spring import Spring, Point
 from .mouse import Mouse
 from .polygon import Polygon
 from .debug import Debug
+from .texturing import TextureMapper
 from math import pi, sqrt
 
 
@@ -17,10 +18,27 @@ class PressureSoftbody:
         self.gas_amount = gas_amount
         self.area = 0
 
+        self.center = pygame.Vector2(0, 0)
+
+        self.obstacles = obstacles
+
         self.polygon = None
 
-        #these are polygon class 
-        self.obstacles = obstacles
+        texture = pygame.image.load('src/assets/texture1.png').convert()
+        textureTris = [
+            [[0, 130], [80, 0], [160, 80]]
+            ]
+        mappedTris = [
+            [[300, 170], [330, 50], [410, 130]]
+            ]
+        self.TextureMapper = TextureMapper(texture, textureTris, mappedTris)
+
+    def get_center(self, points):
+        sumPoints = pygame.Vector2(0, 0)
+        for point in points:
+            sumPoints += point
+
+        return sumPoints / len(points)
 
     def draw(self, screen):
         self.update()
@@ -33,12 +51,19 @@ class PressureSoftbody:
 
         self.polygon.draw(screen)
 
+        self.TextureMapper.draw(screen)
+
+        mappedTris = [
+            [self.points[0].position, self.center, self.points[1].position]
+            ]
+        self.TextureMapper.updateMapped(mappedTris)
+
         Debug.text((5, 5), f'Area: {round(self.area, 2)}')
         Debug.text((5, 35), f'Gas Amount: {self.gas_amount}')
 
     def update(self):
         self.area = self.CalculateArea()
-        
+
         for spring in self.springs:
             self.ApplyPressure(spring)
             spring.update()
@@ -52,6 +77,8 @@ class PressureSoftbody:
             self.CollisionResolve(index, point)
 
         points = [point.position for point in self.points]
+        self.center = self.get_center(points)
+
         self.polygon.update(points)
 
     def CollisionResolve(self, index, point):
