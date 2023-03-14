@@ -3,17 +3,30 @@ from .mouse import Mouse
 from .debug import Debug
 
 
-#not separate simulation, but for interaction with softbodies
+# not separate simulation, but for interaction with softbodies
 class HardBall:
-    def __init__(self, radius, softbodies):
+    def __init__(self, radius, softbodies, texture=None):
         self.position = Mouse.position
+        
         self.radius = radius
         self.softbodies = softbodies
+
+        self.center = self.position - pygame.Vector2(self.radius, self.radius)
+
+        self.texture = texture
 
     def draw(self, screen):
         pygame.draw.circle(screen, (115, 115, 115), self.position, self.radius)
 
+    def draw_sdl2(self):
+        # drawing nothing because can't draw circle
+        if self.texture != None:
+            self.texture.draw(
+                [(0, 0), (160, 160)],
+                (self.center, (self.radius * 2, self.radius * 2)))
+
     def update(self):
+        self.center = self.position - pygame.Vector2(self.radius, self.radius)
         for softbody in self.softbodies:
             inside = softbody.polygon.collide_point(self.position)
             if inside:
@@ -25,14 +38,15 @@ class HardBall:
                 distance = distanceVec.length() - self.radius
 
                 if distance < 0:
-                    #calculating separating force
+                    # calculating separating force
                     SepForce = normalDist.elementwise() * -(distance * 1.0)
                     point.acceleration -= SepForce
-                    #not sure if this is the best solution, but works fine
+                    # not sure if this is the best solution, but works fine
                     point.position = self.position - normalDist * self.radius
 
 
 from pygame.locals import *
+
 
 class Settinger:
     def __init__(self, softbody):
@@ -67,6 +81,8 @@ class Settinger:
             self.settings = {'gas_amount': False, 'mass': False, 
                             'stiffness': False, 'damping': False}
             self.settings[self.settingsKeys[self.CrntSetting]] = True
+
+            print(f'editing: {self.settingsKeys[self.CrntSetting]}')
             
         
         if event.type == MOUSEWHEEL:
@@ -104,4 +120,6 @@ class Settinger:
                         point.damping = 0
 
                     self.value = point.damping
+
+            print(self.value)
             

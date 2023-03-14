@@ -5,11 +5,11 @@ from .mouse import Mouse
 from .polygon import Polygon
 from .debug import Debug
 from .texturing import TextureMapper
-from math import pi, sqrt
+from math import pi, sqrt, cos, sin, radians
 
 
 class PressureSoftbody:
-    def __init__(self, ScreenSize, gas_amount, obstacles=[]):
+    def __init__(self, ScreenSize, gas_amount, renderer, obstacles=[]):
         self.ScreenSize = ScreenSize
 
         self.points = []
@@ -24,14 +24,11 @@ class PressureSoftbody:
 
         self.polygon = None
 
-        texture = pygame.image.load('src/assets/texture1.png').convert()
-        textureTris = [
-            [[0, 130], [80, 0], [160, 80]]
-            ]
-        mappedTris = [
-            [[300, 170], [330, 50], [410, 130]]
-            ]
-        self.TextureMapper = TextureMapper(texture, textureTris, mappedTris)
+        #if textured: ...
+        texture = pygame.image.load('src/assets/texture3.png').convert_alpha()
+        uvTris = []
+        mappedTris = []
+        self.TextureMapper = TextureMapper(renderer, texture, uvTris, mappedTris)
 
     def get_center(self, points):
         sumPoints = pygame.Vector2(0, 0)
@@ -51,16 +48,24 @@ class PressureSoftbody:
 
         self.polygon.draw(screen)
 
-        self.TextureMapper.draw(screen)
-
-        mappedTris = [
-            [self.points[0].position, self.center, self.points[1].position]
-            ]
-        self.TextureMapper.updateMapped(mappedTris)
+        self.TextureMapper.draw_sdl2()
 
         Debug.text((5, 5), f'Area: {round(self.area, 2)}')
         Debug.text((5, 35), f'Gas Amount: {self.gas_amount}')
 
+    def updateMapped(self):
+        '''Updated mapped triangles'''
+        mappedTris = []
+        for index in range(len(self.points)):
+            nextPoint = index + 1
+            if nextPoint >= len(self.points):
+                nextPoint = 0
+            mappedTris.append(
+                [self.points[index].position, self.center, self.points[nextPoint].position]
+            )
+        
+        self.TextureMapper.updateMapped(mappedTris)
+        
     def update(self):
         self.area = self.CalculateArea()
 
@@ -78,7 +83,9 @@ class PressureSoftbody:
 
         points = [point.position for point in self.points]
         self.center = self.get_center(points)
-
+        
+        self.updateMapped()
+        #self.TextureMapper.updateMapped(points)
         self.polygon.update(points)
 
     def CollisionResolve(self, index, point):
@@ -111,18 +118,6 @@ class PressureSoftbody:
 
                 colPoint.acceleration -= collision[2]
                 colPoint.velocity *= 0
-
-        #simpler collision detection, but works practically the same result
-        '''for obstacle in self.obstacles:
-            #[edgeIndex, closestPoint, normalVec]
-            collision = obstacle.collisionResolve(point.position)
-
-            if collision != False:
-                point.position = collision[1]
-                #print(collision[2].elementwise() * point.velocity)         
-                point.acceleration -= collision[2] * point.gravity[1] #collision[2]# * point.velocity
-                point.velocity *= 0
-        '''
 
     def CalculateArea(self):
         '''
@@ -164,8 +159,9 @@ class PressureSoftbody:
 
 class SoftbodyBall(PressureSoftbody):
     def __init__(self, ScreenSize, center, radius, sides,
-                mass, stiffness, damping, gas_amount, obstacles=[]):
-        super().__init__(ScreenSize, gas_amount, obstacles)
+                mass, stiffness, damping, gas_amount, renderer, 
+                obstacles=[]):
+        super().__init__(ScreenSize, gas_amount, renderer, obstacles)
 
         self.center = pygame.Vector2(center)
         self.radius = radius
@@ -173,6 +169,7 @@ class SoftbodyBall(PressureSoftbody):
 
         sideLength = (2 * radius * pi) / self.sides
 
+        uvPoses = []
         AnglePerSide = 360 / sides
         for side in range(sides):
             angle = AnglePerSide * side
@@ -183,7 +180,14 @@ class SoftbodyBall(PressureSoftbody):
             self.points.append(
                 Point(position, mass, damping, False)
             )
-        
+            uvPoses.append(
+                pygame.Vector2(
+                0.5 + (cos(radians(angle)) / 2),
+                0.5 + (sin(radians(angle)) / 2)
+                )
+            )
+
+        uvTris = []
         indices = []
         for index, point in enumerate(self.points):
             nextPoint = index + 1
@@ -194,9 +198,20 @@ class SoftbodyBall(PressureSoftbody):
             self.springs.append(
                 Spring(point, self.points[nextPoint],
                     stiffness, sideLength, damping))
+            #center
+            uvTris.append([uvPoses[index], [0.5, 0.5], uvPoses[nextPoint]])
+
+        self.TextureMapper.updateUV(uvTris)
 
         points = [point.position for point in self.points]
         self.polygon = Polygon(points, indices, False, self)
+        #
+        #...
+
+
+
+
+
 
 
 # ---- Square softbody below which i don't need right now

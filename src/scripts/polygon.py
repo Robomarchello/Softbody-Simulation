@@ -51,6 +51,15 @@ class Polygon:
     def draw(self, screen):
         pygame.draw.polygon(screen, (0, 0, 0), self.points, 1)
 
+    def draw_sdl2(self, renderer):
+        for index in range(len(self.points)):
+            nextIndex = index + 1
+            if nextIndex >= len(self.points):
+                nextIndex = 0
+            
+            renderer.draw_color = (0, 0, 0, 255)
+            renderer.draw_line(self.points[index], self.points[nextIndex])
+
     def get_rect(self):
         xPoses = [point.x for point in self.points]
         yPoses = [point.y for point in self.points]

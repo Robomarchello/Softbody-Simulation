@@ -3,7 +3,7 @@ from .polygon import PolygonJson
 
 
 class SoftbodyHandler:
-    def __init__(self, ScreenSize):
+    def __init__(self, ScreenSize, renderer):
         self.ScreenSize = ScreenSize
         gas_amount = 1500.0
         mass = 5
@@ -17,8 +17,8 @@ class SoftbodyHandler:
         self.softbodies.append(
             SoftbodyBall(
             self.ScreenSize, (150, 50), 30, 16,
-            mass, stiffness, damping, gas_amount, 
-            self.polygons.copy()
+            mass, stiffness, damping, gas_amount,
+            renderer, self.polygons.copy()
             )
         )
 
