@@ -31,8 +31,6 @@ class App():
         self.fps = fps
 
     def loop(self):
-        screen = self.screen
-        renderer = self.renderer
         while True:
             self.clock.tick(self.fps)
 
@@ -44,47 +42,41 @@ class App():
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
 
-            renderer.draw_color = (255, 255, 255, 255)
-            renderer.clear()
-
-            self.Settinger.draw()
-
-            for polygon in self.polygons:
-                polygon.draw_sdl2(renderer)
-
             self.HardBall.update()
-            self.SoftbodyHandler.draw(screen)
 
-            Debug.draw(screen)
-            self.HardBall.draw_sdl2()
+            self.draw()
+
+            pygame.display.set_caption(str(round(self.clock.get_fps())))
+
+    def draw(self):
+        renderer = self.renderer
+        screen = self.screen
+
+        renderer.draw_color = (255, 255, 255, 255)
+        renderer.clear()
+
+        self.Settinger.draw()
+
+        for polygon in self.polygons:
+            polygon.draw_sdl2(renderer)
+
+        self.SoftbodyHandler.draw(screen)
+        self.HardBall.draw_sdl2()
         
-            renderer.present()
+        renderer.present()
 
     def draw_debug(self):
         #not _sdl2 draw
-        ...
-'''
-            self.clock.tick(self.fps)
-            self.Settinger.draw()
-            screen.fill((255, 255, 255))
+        screen = self.screen
 
-            for polygon in self.polygons:
-                polygon.draw_sdl2(screen)
+        screen.fill((255, 255, 255))
 
-            self.HardBall.update()
-            self.SoftbodyHandler.draw(screen)
+        for polygon in self.polygons:
+            polygon.draw(screen)
 
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    raise SystemExit
-                
-                for event_handler in self.event_handlers:
-                    event_handler.handle_event(event)
+        self.HardBall.draw(screen)
 
-            Debug.draw(screen)
-            self.HardBall.draw(screen)
-        
-            pygame.display.update()
-            
-'''
+        self.SoftbodyHandler.draw(screen)
+
+        Debug.draw(screen)
+        pygame.display.update()

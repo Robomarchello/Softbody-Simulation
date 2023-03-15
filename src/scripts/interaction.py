@@ -14,6 +14,9 @@ class HardBall:
         self.center = self.position - pygame.Vector2(self.radius, self.radius)
 
         self.texture = texture
+        #if texture != None:
+        #texture = pygame.image.load(texture).convert_alpha()
+        #self.texture = Texture.from_surface(renderer, texture)
 
     def draw(self, screen):
         pygame.draw.circle(screen, (115, 115, 115), self.position, self.radius)
