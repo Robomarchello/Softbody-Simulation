@@ -1,7 +1,6 @@
 import pygame
 from pygame import Vector2
 from json import loads
-from .debug import Debug
 
 
 class Polygon:
@@ -36,7 +35,8 @@ class Polygon:
             self.edges.append(edge)
 
         self.rect = self.get_rect()
-
+    
+    #trm
     def indicesToEdges(self, indices):
         '''updating edges'''
         edges = []
@@ -61,10 +61,11 @@ class Polygon:
             renderer.draw_line(self.points[index], self.points[nextIndex])
 
     def get_rect(self):
+        '''get min and max points of polygon and return rect'''
         xPoses = [point.x for point in self.points]
         yPoses = [point.y for point in self.points]
 
-        topleft = [min(xPoses), min(yPoses)] #min poses
+        topleft = [min(xPoses), min(yPoses)]
         size = [max(xPoses) - topleft[0], max(yPoses) - topleft[1]]
 
         return pygame.Rect(topleft, size)
@@ -97,9 +98,6 @@ class Polygon:
 
             if position.x >= Checkline[0].x and position.x <= Checkline[1].x:
                 intersections.append(position)
-                #Debug.circle(position, 2, 0)
-
-        #Debug.text((5, 5), str(len(intersections)))
 
         result = []
         for intersection in intersections:
@@ -165,7 +163,6 @@ class Polygon:
         return False
         
     def getClosest(self, position, edge):
-          #Hope you get this
         '''Returns the closest point on a line segment from point'''
         TargetPointPos = position - edge[0] 
 

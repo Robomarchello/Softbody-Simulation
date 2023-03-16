@@ -77,9 +77,9 @@ class Spring:
         distance = self.point1.position - self.point2.position
         length = self.length
         if length != 0:
-            normalVec = distance / length  #.normalize()
+            normalVec = distance / length  
                 
-            springForce = (-self.stiffness * (length - self.restLength))
+            springForce = -self.stiffness * (length - self.restLength)
             
             return springForce * normalVec
 
@@ -90,7 +90,7 @@ class Spring:
         gets perpendicular normal vector to the spring
         cool trick to get perpendicular vector:
         vec = [vec.y, -vec.x]
-        it's pretty simple but i like it
+        pygame.Vector2 does this too but i still use mine
         '''
         SpringVec = self.point2.position - self.point1.position
         if SpringVec.length() != 0:
@@ -100,10 +100,10 @@ class Spring:
         
         return pygame.Vector2(0, 0)
 
-    def DrawNormal(self, force):
+    def DrawNormal(self, force, length):
         SpringVec = self.point2.position - self.point1.position
         startPos = SpringVec * 0.5 + self.point1.position
-        endPos = startPos + (force * 5)
+        endPos = startPos + (force * length)
 
         Debug.line(startPos, endPos, (0, 0, 0))
 

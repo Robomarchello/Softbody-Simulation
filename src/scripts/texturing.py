@@ -1,6 +1,6 @@
 import pygame
 import numpy
-from pygame._sdl2 import Renderer, Texture
+from pygame._sdl2 import Texture
 
 
 class TextureMapper:
@@ -28,7 +28,10 @@ class TextureMapper:
 
     def updateUV(self, UVTris):
         self.UVTris = UVTris
+        
 
+
+    # ----
     def textureTri(self, UVTri, mappedTri):
         xPoses = numpy.take(mappedTri, 0, axis=1)
         yPoses = numpy.take(mappedTri, 1, axis=1)

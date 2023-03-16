@@ -7,7 +7,7 @@ class Debug:
     draw_queue = []
 
     font = pygame.font.Font('src/assets/font.ttf', 16)
-    display = False#True
+    display = False
 
     @classmethod
     def line(cls, startPos, endPos, color=(0, 0, 0)):

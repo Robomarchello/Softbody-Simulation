@@ -25,7 +25,6 @@ class PressureSoftbody:
         self.polygon = None
 
         if texture != None:
-            #texture = pygame.image.load('src/assets/texture2.png').convert_alpha()
             uvTris = []
             mappedTris = []
             self.TextureMapper = TextureMapper(renderer, texture, uvTris, mappedTris)
@@ -89,7 +88,6 @@ class PressureSoftbody:
         self.center = self.get_center(points)
         
         self.updateMapped()
-        #self.TextureMapper.updateMapped(points)
         self.polygon.update(points)
 
     def CollisionResolve(self, index, point):
@@ -128,7 +126,7 @@ class PressureSoftbody:
         Simple, but inaccurate way to calculate area
         *Probably* will change it
         '''
-        # i don't like that making 2 loops for x and y poses
+
         xPoses = [point.position.x for point in self.points]
         yPoses = [point.position.y for point in self.points]
 
@@ -153,12 +151,14 @@ class PressureSoftbody:
         normalVec = spring.GetNormal()
         OneOverArea = 1 / self.area
 
-        PressureForce =  (OneOverArea * length * self.gas_amount) * normalVec
+        PressureForce = (OneOverArea * length * self.gas_amount) * normalVec
+        #Multiplying to make it stronger, otherwise it's less fun
+        PressureForce *= 5
 
-        spring.point1.acceleration += PressureForce # / spring.point1.mass
-        spring.point2.acceleration += PressureForce # / spring.point2.mass
+        spring.point1.acceleration += PressureForce / spring.point1.mass
+        spring.point2.acceleration += PressureForce / spring.point2.mass
 
-        spring.DrawNormal(PressureForce)
+        spring.DrawNormal(PressureForce / spring.point1.mass, 10)
 
 
 class SoftbodyBall(PressureSoftbody):
@@ -202,7 +202,7 @@ class SoftbodyBall(PressureSoftbody):
             self.springs.append(
                 Spring(point, self.points[nextPoint],
                     stiffness, sideLength, damping))
-            #center
+
             uvTris.append([uvPoses[index], [0.5, 0.5], uvPoses[nextPoint]])
         
         if self.TextureMapper != None:
@@ -210,9 +210,6 @@ class SoftbodyBall(PressureSoftbody):
 
         points = [point.position for point in self.points]
         self.polygon = Polygon(points, indices, False, self)
-        #
-        #...
-
 
 
 
