@@ -60,7 +60,6 @@ class Settinger:
         self.settingsKeys = list(self.settings.keys())
         self.CrntSetting = 0
 
-        #to draw
         self.value = 0
 
     def draw(self):

@@ -3,8 +3,8 @@ from pygame import Vector2
 from pygame.locals import *
 from mouse import Mouse
 
-
 pygame.init()
+
 
 class App():
     def __init__(self, ScreenSize, caption, fps):

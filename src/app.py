@@ -49,6 +49,7 @@ class App():
             pygame.display.set_caption(str(round(self.clock.get_fps())))
 
     def draw(self):
+        #draw with textures
         renderer = self.renderer
         screen = self.screen
 
@@ -66,7 +67,6 @@ class App():
         renderer.present()
 
     def draw_debug(self):
-        #not _sdl2 draw
         screen = self.screen
 
         screen.fill((255, 255, 255))

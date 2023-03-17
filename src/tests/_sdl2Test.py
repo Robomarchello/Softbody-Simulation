@@ -15,7 +15,7 @@ class App():
         self.window = Window.from_display_module()
         self.renderer = Renderer(self.window)
 
-        image = pygame.image.load('src/assets/texture1.png').convert_alpha()
+        image = pygame.image.load('texture.png').convert_alpha()
         self.texture = Texture.from_surface(self.renderer, image)
 
         self.clock = pygame.time.Clock()
