@@ -56,7 +56,8 @@ class Settinger:
         self.softbody = softbody
 
         self.settings = {'gas_amount': True, 'mass': False, 
-                        'stiffness': False, 'damping': False}
+                        'stiffness': False, 'damping': False,
+                        'gravity': False}
         self.settingsKeys = list(self.settings.keys())
         self.CrntSetting = 0
 
@@ -81,7 +82,8 @@ class Settinger:
                     self.CrntSetting = len(self.settings) - 1
 
             self.settings = {'gas_amount': False, 'mass': False, 
-                            'stiffness': False, 'damping': False}
+                            'stiffness': False, 'damping': False,
+                            'gravity': False}
             self.settings[self.settingsKeys[self.CrntSetting]] = True
 
             print(f'editing: {self.settingsKeys[self.CrntSetting]}')
@@ -122,6 +124,11 @@ class Settinger:
                         point.damping = 0
 
                     self.value = point.damping
+                
+            if self.settings['gravity']:
+                self.softbody.gravity += (0, event.y * 0.005)
+
+                self.value = self.softbody.gravity
 
             print(self.value)
             

@@ -12,6 +12,8 @@ class PressureSoftbody:
     def __init__(self, ScreenSize, gas_amount, renderer, obstacles=[], texture=None):
         self.ScreenSize = ScreenSize
 
+        self.gravity = pygame.Vector2(0, 0.1)
+
         self.points = []
         self.springs = []
 
@@ -80,8 +82,11 @@ class PressureSoftbody:
         self.polygon.update(points)
 
         for index, point in enumerate(self.points):
+            gravity = self.gravity * point.mass
+            point.acceleration += gravity  # appling gravity
+
             point.update()
-            point.resolveBounds(self.ScreenSize)
+            point.resolveBounds(self.ScreenSize, gravity)
             self.CollisionResolve(index, point)
 
         points = [point.position for point in self.points]
@@ -102,7 +107,7 @@ class PressureSoftbody:
             if collision != False and obstacle.static: 
                 colPoint.position = collision[1]        
 
-                colPoint.acceleration -= collision[2] * colPoint.gravity[1]
+                colPoint.acceleration -= collision[2] * self.gravity[1]
                 colPoint.velocity *= 0
 
             if collision != False and not obstacle.static:

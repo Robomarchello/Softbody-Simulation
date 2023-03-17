@@ -10,7 +10,6 @@ class Point:
         self.damping = damping
         self.static = static
 
-        self.gravity = pygame.Vector2(0, 0.1) * self.mass
         self.velocity = pygame.Vector2(0, 0)
         self.acceleration = pygame.Vector2(0, 0)
 
@@ -18,34 +17,33 @@ class Point:
         pygame.draw.circle(screen, (255, 0, 0), self.position, 6)
 
     def update(self):
-        self.acceleration += self.gravity
-
         self.velocity += self.acceleration
+        
         if not self.static:
             self.position += self.velocity
 
         self.velocity *= self.damping
         self.acceleration *= 0
 
-    def resolveBounds(self, ScreenSize):
+    def resolveBounds(self, ScreenSize, gravity):
         if self.position.x < 0:
             self.position.x = 0
-            self.acceleration.x += self.gravity[1]
+            self.acceleration.x += gravity[1]
             self.velocity.x *= 0
 
         if self.position.x > ScreenSize[0]:
             self.position.x = ScreenSize[0]
-            self.acceleration.x -= self.gravity[1]
+            self.acceleration.x -= gravity[1]
             self.velocity.x *= 0
 
         if self.position.y < 0:
             self.position.y = 0
-            self.acceleration.y += self.gravity[1]
+            self.acceleration.y += gravity[1]
             self.velocity.y *= 0
 
         if self.position.y > ScreenSize[1]:
             self.position.y = ScreenSize[1]
-            self.acceleration.y -= self.gravity[1]
+            self.acceleration.y -= gravity[1]
             self.velocity.y *= 0
 
 
