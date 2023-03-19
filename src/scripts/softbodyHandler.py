@@ -11,10 +11,12 @@ class SoftbodyHandler:
         stiffness = 1.0
         damping = 0.96
 
-        self.polygons = [PolygonJson('src/assets/polygon.json')]
+        self.polygons = [PolygonJson('src/assets/polygon.json'),
+                         PolygonJson('src/assets/polygon1.json')]
 
         texture = pygame.image.load('src/assets/candy.png').convert_alpha()
         texture1 = pygame.image.load('src/assets/kirby.png').convert_alpha()
+        texture2 = pygame.image.load('src/assets/ball.png').convert_alpha()
         self.softbodies = []
 
         self.softbodies.append(
@@ -37,7 +39,7 @@ class SoftbodyHandler:
             SoftbodyBall(
             self.ScreenSize, (700, 400), 30, 16,
             mass, stiffness, damping, gas_amount,
-            renderer, self.polygons.copy(), texture
+            renderer, self.polygons.copy(), texture2
             )
         )
 
