@@ -13,8 +13,8 @@ class SoftbodyHandler:
 
         self.polygons = [PolygonJson('src/assets/polygon.json')]
 
-        texture = pygame.image.load('src/assets/texture2.png').convert_alpha()
-        texture1 = pygame.image.load('src/assets/texture.png').convert_alpha()
+        texture = pygame.image.load('src/assets/candy.png').convert_alpha()
+        texture1 = pygame.image.load('src/assets/kirby.png').convert_alpha()
         self.softbodies = []
 
         self.softbodies.append(
