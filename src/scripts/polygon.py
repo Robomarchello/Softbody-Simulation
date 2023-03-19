@@ -36,7 +36,6 @@ class Polygon:
 
         self.rect = self.get_rect()
     
-    #trm
     def indicesToEdges(self, indices):
         '''updating edges'''
         edges = []
